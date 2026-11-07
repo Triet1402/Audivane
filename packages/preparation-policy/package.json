@@ -1,0 +1,14 @@
+{
+  "name": "@codec-abx/preparation-policy",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@codec-abx/contracts": "0.1.0",
+    "@codec-abx/measurements": "0.1.0"
+  }
+}

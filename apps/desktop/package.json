@@ -1,0 +1,11 @@
+{
+  "name": "@codec-abx/desktop",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "main": "dist/main.cjs",
+  "type": "module",
+  "dependencies": {
+    "@codec-abx/experiment-browser": "0.1.0"
+  }
+}

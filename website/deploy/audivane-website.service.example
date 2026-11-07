@@ -1,0 +1,30 @@
+# Audivane site server — template only.
+#
+# Copy to ~/.config/systemd/user/audivane-website.service, then adjust
+# WorkingDirectory if the checkout is not at the path below. The %h specifier
+# expands to the user's home directory. This unit contains no credentials.
+#
+# Requires a completed build in website/dist and installed root/website
+# dependencies. See website/README.md before enabling it. PATH assumes node is
+# in ~/.local/bin; adjust it if Node is installed elsewhere.
+
+[Unit]
+Description=Audivane website and browser demo (loopback)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Project/Codec_ABX_test/website
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=8088
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/env node scripts/serve.mjs
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=default.target

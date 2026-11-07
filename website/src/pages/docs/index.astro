@@ -1,0 +1,30 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const docs = (await getCollection("docs")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="Documentation — Audivane"
+  description="How blind ABX testing works, Audivane's scientific policy, supported audio formats and limits, release status and license credits."
+>
+  <div class="section-head wrap">
+    <h1>Documentation</h1>
+    <p class="lead">
+      How Audivane tests, what it guarantees and what it deliberately does
+      not claim. Five short pages, no marketing.
+    </p>
+  </div>
+  <div class="content-index wrap">
+    {
+      docs.map((doc) => (
+        <a class="content-index-item" href={`/docs/${doc.id}/`}>
+          <h2>{doc.data.title}</h2>
+          <p>{doc.data.description}</p>
+          <span class="content-index-read" aria-hidden="true">Read →</span>
+        </a>
+      ))
+    }
+  </div>
+</BaseLayout>

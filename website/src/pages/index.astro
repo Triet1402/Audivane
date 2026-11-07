@@ -1,0 +1,170 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const docs = (await getCollection("docs")).sort((a, b) => a.data.order - b.data.order);
+const guides = (await getCollection("guides")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="Audivane — Blind audio comparisons"
+  description="Can you tell lossless from lossy? Compare FLAC and AAC at 256 kbps with your own music in a blind ABX listening test. The browser demo processes audio locally on your device, without uploading your audio."
+>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        name: "Audivane",
+        url: "https://audivane.app/",
+        logo: "https://audivane.app/mark.svg",
+      },
+      {
+        "@type": "WebSite",
+        name: "Audivane",
+        url: "https://audivane.app/",
+      },
+    ],
+  })} />
+
+  <section class="hero wrap" aria-labelledby="hero-title">
+    <div class="intro">
+      <h1 id="hero-title">
+        Can you hear<br /><span>the difference?</span>
+      </h1>
+      <p class="lead">
+        Lossless vs lossy. FLAC vs AAC at 256 kbps.<br />
+        Compare them with your own music in a blind listening test.
+        Listen without seeing the labels and find out what you can hear.
+      </p>
+      <div class="hero-actions">
+        <a class="button" href="/demo/">Find out for yourself <span aria-hidden="true">↗</span></a>
+        <a class="button quiet" href="/docs/what-is-abx/">How ABX works</a>
+      </div>
+      <p class="availability">
+        Audivane 0.1.0 is available. <a href="/downloads/">Download the desktop app</a>. <a href="/docs/release-status/">Release status</a>
+      </p>
+    </div>
+    <figure class="comparison">
+      <svg class="soundprint" viewBox="0 0 480 110" fill="none" aria-hidden="true">
+        {Array.from({length: 79}, (_, i) => {
+          const height = 8 + Math.pow(Math.sin(i * .37), 2) * (20 + 65 * Math.pow(Math.sin(i * .063), 2));
+          return <path d={`M${6+i*6} ${55-height/2}v${height}`} stroke="currentColor" stroke-width="2" stroke-linecap="round" />;
+        })}
+      </svg>
+      <div class="comparison-top">
+        <span>A listening experiment.</span><img src="/mark.svg" width="28" height="28" alt="" />
+      </div>
+      <div class="pair" aria-hidden="true">
+        <div>A<span>One chain</span></div>
+        <div>B<span>Another chain</span></div>
+      </div>
+      <div class="unknown">
+        <span class="x" aria-hidden="true">X</span>
+        <p>The same as A or B.<br /><strong>Can you tell which?</strong></p>
+      </div>
+      <figcaption>
+        ABX compares a hidden sample against two known references. The answer
+        stays hidden while you listen.
+      </figcaption>
+    </figure>
+  </section>
+
+  <div class="local">
+    <div class="wrap">
+      <span>Runs in your browser. Audio stays on your device.</span>
+      <span>The website downloads the app to your browser. Your browser processes and plays your audio locally; your audio files are never uploaded to Audivane.</span>
+    </div>
+  </div>
+
+  <section class="explanation wrap" aria-labelledby="how-title">
+    <h2 id="how-title">Less expectation.<br />More listening.</h2>
+    <div class="steps">
+      <article>
+        <h3>Bring a track you know.</h3>
+        <p>Import a local audio file and choose the codec chain for each side. Both chains start from the same decoded source.</p>
+      </article>
+      <article>
+        <h3>Prepare a fair comparison.</h3>
+        <p>Audivane aligns and level-matches the pair, verifies the delivered audio, and stages the first trial paused. You decide when to play.</p>
+      </article>
+      <article>
+        <h3>Listen. Choose. Review.</h3>
+        <p>Switch between A, B and X, then decide whether X is A or B. Complete the planned trials and review the results and preparation evidence.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="learn wrap" aria-labelledby="learn-title">
+    <div class="learn-head">
+      <h2 id="learn-title">Understand the method.</h2>
+      <p>
+        Short, exact answers about how Audivane tests — and how to set up,
+        run and read a comparison that means something.
+      </p>
+    </div>
+    <div class="learn-columns">
+      <div class="learn-list">
+        <a class="learn-title" href="/docs/">Documentation <span aria-hidden="true">→</span></a>
+        {
+          docs.map((doc) => (
+            <a class="learn-item" href={`/docs/${doc.id}/`}>
+              <span>{doc.data.title}</span>
+              {doc.data.description}
+            </a>
+          ))
+        }
+      </div>
+      <div class="learn-list">
+        <a class="learn-title" href="/guides/">Guides <span aria-hidden="true">→</span></a>
+        {
+          guides.map((guide) => (
+            <a class="learn-item" href={`/guides/${guide.id}/`}>
+              <span>{guide.data.title}</span>
+              {guide.data.description}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="release" aria-labelledby="release-title">
+    <div class="wrap release-inner">
+      <div>
+        <h2 id="release-title">Your music.<br />Your comparison.</h2>
+        <p>
+          Audivane 0.1.0 is available for Linux and Windows. This site is the
+          project's home; documentation, guides, release status and
+          downloads with checksums and provenance all live
+          here.
+        </p>
+      </div>
+      <dl class="platforms">
+        <div>
+          <dt>Linux desktop</dt>
+          <dd>Ubuntu and Arch package installation, sandbox and removal checked in virtual machines. Version 0.1.0 packages are available; final desktop listening coverage remains incomplete.</dd>
+        </div>
+        <div>
+          <dt>Windows desktop</dt>
+          <dd>Installer, portable listening/export and process cleanup tested on Windows 11. Unsigned 0.1.0 downloads are available with known testing limits.</dd>
+        </div>
+        <div>
+          <dt>Browser demo</dt>
+          <dd>Try the working <a href="/demo/">browser preview</a>. <a href="/sources/">Source and codec materials</a> accompany it; desktop downloads are available for version 0.1.0.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="scope wrap" aria-labelledby="scope-title">
+    <h2 id="scope-title">Evidence, with its limits.</h2>
+    <p>
+      Audivane records preparation, delivered-audio identity and fixed-trial
+      ABX results. Numerical checks alone do not prove an audible difference or
+      certify a codec. Your hardware, operating-system processing and listening
+      conditions still matter.
+    </p>
+    <p><a href="/docs/scientific-policy/">Read the scientific policy →</a></p>
+  </section>
+</BaseLayout>

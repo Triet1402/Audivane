@@ -1,0 +1,30 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const guides = (await getCollection("guides")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="Guides — Audivane"
+  description="Practical guides: run your first blind ABX test, set up a fair listening environment, and read your results without fooling yourself."
+>
+  <div class="section-head wrap">
+    <h1>Guides</h1>
+    <p class="lead">
+      Practical, honest steps — running a first test, keeping the listening
+      setup fair, and reading a result without fooling yourself.
+    </p>
+  </div>
+  <div class="content-index wrap">
+    {
+      guides.map((guide) => (
+        <a class="content-index-item" href={`/guides/${guide.id}/`}>
+          <h2>{guide.data.title}</h2>
+          <p>{guide.data.description}</p>
+          <span class="content-index-read" aria-hidden="true">Read →</span>
+        </a>
+      ))
+    }
+  </div>
+</BaseLayout>

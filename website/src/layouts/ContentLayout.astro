@@ -1,0 +1,117 @@
+---
+import type { CollectionEntry, CollectionKey, render } from "astro:content";
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  collection: Extract<CollectionKey, "docs" | "guides">;
+  entry: CollectionEntry<"docs"> | CollectionEntry<"guides">;
+  siblings: Array<CollectionEntry<"docs"> | CollectionEntry<"guides">>;
+  /** The rendered Markdown body, exactly as render() returns it. */
+  Content: Awaited<ReturnType<typeof render>>["Content"];
+  headings: Awaited<ReturnType<typeof render>>["headings"];
+}
+const { collection, entry, siblings, Content, headings } = Astro.props;
+
+const section = {
+  docs: { label: "Documentation", index: "/docs/" },
+  guides: { label: "Guides", index: "/guides/" },
+}[collection];
+const other =
+  collection === "docs"
+    ? { label: "Guides", index: "/guides/" }
+    : { label: "Documentation", index: "/docs/" };
+
+const ordered = [...siblings].sort((a, b) => a.data.order - b.data.order);
+const current = ordered.findIndex((e) => e.id === entry.id);
+const prev = current > 0 ? ordered[current - 1] : undefined;
+const next = current >= 0 && current < ordered.length - 1 ? ordered[current + 1] : undefined;
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const updated = entry.data.updated.toLocaleDateString("en-GB", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<BaseLayout
+  title={`${entry.data.title} — ${section.label} — Audivane`}
+  description={entry.data.description}
+  ogType="article"
+>
+  <div class="doc-shell wrap">
+    <aside class="doc-rail" aria-label={`${section.label} navigation`}>
+      <a class="doc-rail-section" href={section.index}>{section.label}</a>
+      <nav>
+        {
+          ordered.map((sib) => (
+            <a
+              class="doc-rail-link"
+              href={`${section.index}${sib.id}/`}
+              aria-current={sib.id === entry.id ? "page" : undefined}
+            >
+              {sib.data.title}
+            </a>
+          ))
+        }
+      </nav>
+      <a class="doc-rail-link" href={other.index}>
+        {other.label} <span aria-hidden="true">→</span>
+      </a>
+    </aside>
+
+    <article class="doc-article">
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href={section.index}>{section.label}</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{entry.data.title}</span>
+      </nav>
+
+      <header class="doc-head">
+        <h1>{entry.data.title}</h1>
+        <p class="doc-updated">Updated <time datetime={entry.data.updated.toISOString()}>{updated}</time></p>
+      </header>
+
+      <div class="prose">
+        <Content />
+      </div>
+
+      <nav class="doc-pager" aria-label="Page navigation">
+        {
+          prev ? (
+            <a class="doc-pager-link" href={`${section.index}${prev.id}/`} rel="prev">
+              <span>Previous</span>
+              {prev.data.title}
+            </a>
+          ) : (
+            <span aria-hidden="true" />
+          )
+        }
+        {
+          next ? (
+            <a class="doc-pager-link next" href={`${section.index}${next.id}/`} rel="next">
+              <span>Next</span>
+              {next.data.title}
+            </a>
+          ) : null
+        }
+      </nav>
+    </article>
+
+    {
+      toc.length > 0 && (
+        <nav class="doc-toc" aria-label="On this page">
+          <span class="doc-toc-heading">On this page</span>
+          <ul>
+            {toc.map((h) => (
+              <li class={h.depth === 3 ? "sub" : undefined}>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+  </div>
+</BaseLayout>

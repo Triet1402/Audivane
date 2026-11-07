@@ -1,0 +1,31 @@
+{
+  "name": "audivane-website",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "node scripts/build.mjs",
+    "build:content": "astro build",
+    "build:demo": "node scripts/build-demo.mjs",
+    "package:sources": "node scripts/package-sources.mjs",
+    "publish:local": "node scripts/publish-local.mjs",
+    "start": "node scripts/serve.mjs",
+    "verify:seo": "node scripts/verify-seo.mjs",
+    "test:browser": "node scripts/test-browser.mjs",
+    "preview": "astro preview",
+    "sync": "astro sync",
+    "check": "astro check",
+    "typecheck": "astro sync && tsc --noEmit -p tsconfig.json",
+    "sources:check": "node src/provenance.mjs check",
+    "sources:pin": "node src/provenance.mjs pin"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.4.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.9.3"
+  }
+}

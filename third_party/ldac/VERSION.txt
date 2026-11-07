@@ -1,0 +1,15 @@
+ldac_helper 1.0.0
+container_version 1
+libldac_repo=https://android.googlesource.com/platform/external/libldac
+libldac_commit=eeee1a3f5f8df1282e3a6d297085885fd886737b
+libldac_version=2.00.02
+libldac_source_archive=https://android.googlesource.com/platform/external/libldac/+archive/eeee1a3f5f8df1282e3a6d297085885fd886737b.tar.gz
+libldacdec_repo=https://github.com/hegdi/libldacdec
+libldacdec_commit=7f3bd6cc1586b764b02f2e4f20b16c7ff18758b9
+libldacdec_source_archive=https://github.com/hegdi/libldacdec/archive/7f3bd6cc1586b764b02f2e4f20b16c7ff18758b9.tar.gz
+binary_sha256=4c784d19fe8493519ea4bbca35ce2ad4f3d8058cb2bf76ecbd4ef88cc5961c61
+built_with=gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+build_baseline=Ubuntu 24.04.3 LTS (x86_64, glibc 2.39)
+build_baseline_method=Ubuntu 24.04.3 base rootfs under proot; host packages untouched
+build_baseline_toolchain=gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0; GNU ld (GNU Binutils for Ubuntu) 2.42
+build_dir=/var/tmp/audivane-ldac

@@ -1,0 +1,199 @@
+name: distribution
+
+# Packaging acceptance only, started manually. There is no release or
+# automatic publication step here; publishing remains a separate action.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  OPENBLAS_NUM_THREADS: "1"
+  OMP_NUM_THREADS: "1"
+
+jobs:
+  linux-deb:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install packaging and runtime dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config curl xz-utils git binutils xvfb \
+            libgtk-3-0t64 libnss3 libxss1 libasound2t64 libgbm1 libdrm2 libxkbcommon0 \
+            libatk-bridge2.0-0t64 libcups2t64 libxcomposite1 libxdamage1 libxrandr2 \
+            libx11-xcb1 libxcb-dri3-0 libpango-1.0-0 libcairo2 xdg-utils
+      - name: Install workspace dependencies
+        run: npm ci
+      - name: Cache pinned Linux baseline inputs
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ runner.temp }}/audivane-linux-baseline
+            ${{ runner.temp }}/audivane-source-cache
+          key: distribution-linux-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/build_linux_baseline.sh', 'tools/build_ffmpeg.sh', 'tools/build_ldac_helper.sh', 'tools/ldac_helper.c') }}
+      - name: Build the pinned Ubuntu 24.04 native codec baseline
+        run: tools/build_linux_baseline.sh --output build/linux-baseline
+      - name: Collect complete third-party materials
+        run: node tools/collect-third-party-materials.mjs --artifacts build/linux-baseline/artifacts --output build/release-materials
+      - name: Stage native bytes and notices for the package
+        run: node tools/distribution/prepare-materials.mjs linux build/linux-baseline/artifacts build/release-materials
+      - name: Check distribution identity and icons
+        run: npm run dist:check
+      - name: Build the Audivane .deb from the prepared full-notice resources
+        run: npm run dist:linux -- --resources build/distribution-resources/linux
+      - name: Prepare the pinned local Arch binary recipe
+        run: npm run dist:arch -- --prepare-only
+      - uses: actions/upload-artifact@v4
+        with:
+          name: audivane-arch-recipe
+          path: |
+            build/arch/recipe/PKGBUILD
+            build/arch/recipe/*-payload.tar.zst
+          if-no-files-found: error
+      - name: Verify checksums, sizes, package contents and libc floor
+        run: npm run dist:verify -- --platform linux
+      - name: Inspect the .deb without root
+        run: tools/distribution/linux-deb-check.sh --deb "$(find dist/release -maxdepth 1 -name 'audivane_*_amd64.deb' -print | sort | tail -n 1)"
+      # The package deploys its own narrow /opt/audivane/audivane userns
+      # AppArmor attachment. Installed launch is a required gate; a sandbox
+      # refusal fails this job rather than being recorded as optional success.
+      - name: Installed .deb launch acceptance
+        run: tools/distribution/linux-deb-check.sh --install --deb "$(find dist/release -maxdepth 1 -name 'audivane_*_amd64.deb' -print | sort | tail -n 1)"
+      - name: Upload Linux release artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audivane-linux-x64
+          path: |
+            dist/release/audivane_*_amd64.deb
+            dist/release/SHA256SUMS-linux.txt
+            dist/release/release-manifest-linux.json
+          if-no-files-found: ignore
+
+  arch-pacman:
+    needs: linux-deb
+    runs-on: ubuntu-24.04
+    container: archlinux:base-devel
+    timeout-minutes: 30
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: audivane-arch-recipe
+          path: /build/recipe
+      - name: Build with native makepkg as an unprivileged Arch user
+        shell: bash
+        run: |
+          pacman -Syu --noconfirm
+          useradd --create-home builder
+          chown -R builder:builder /build/recipe
+          cd /build/recipe
+          runuser -u builder -- env PACKAGER="Audivane CI build" makepkg --nodeps --force --noconfirm
+      - name: Verify pacman installation, codec execution and removal
+        shell: bash
+        run: |
+          cd /build/recipe
+          pacman -U --noconfirm audivane-bin-*.pkg.tar.zst
+          pacman -Qkk audivane-bin
+          /opt/audivane/resources/third_party/ffmpeg/bin/ffmpeg -version
+          /opt/audivane/resources/third_party/ffmpeg/bin/ffprobe -version
+          /opt/audivane/resources/third_party/ldac/bin/ldac_helper --version
+          test -f /usr/share/licenses/audivane-bin/LICENSE
+          test ! -u /opt/audivane/chrome-sandbox
+          pacman -R --noconfirm audivane-bin
+          test ! -e /opt/audivane
+          # Container packaging checks do not establish sandboxed VM acceptance.
+          sha256sum audivane-bin-*.pkg.tar.zst > SHA256SUMS-arch.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: audivane-arch-x86_64
+          path: |
+            /build/recipe/audivane-bin-*.pkg.tar.zst
+            /build/recipe/SHA256SUMS-arch.txt
+            /build/recipe/PKGBUILD
+          if-no-files-found: error
+
+  windows-nsis:
+    runs-on: windows-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install workspace dependencies
+        run: npm ci
+      - name: Install NSIS
+        run: choco install nsis --no-progress -y
+      - name: Build pinned Windows x64 codec bundle in MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-meson
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-pkgconf
+            make
+            curl
+            git
+            tar
+            xz
+          path-type: inherit
+      - name: Build FFmpeg/ffprobe and ldac_helper.exe
+        shell: msys2 {0}
+        run: tools/build_native_windows.sh --out build/windows-native-bundle
+      - name: Build the whole-desktop process lifetime host
+        shell: msys2 {0}
+        run: tools/build_windows_process_host.sh --out build/windows-process-host/bin
+      - name: Exercise real Windows Job Object custody
+        run: npm run test:windows-lifetime
+      - name: Exercise Windows per-codec early-exit custody
+        env:
+          CODEC_ABX_PROCESS_HOST: ${{ github.workspace }}\build\windows-process-host\bin\audivane-process-host.exe
+        run: npm run test:unit -- packages/engine-native/test/typescript-codecs-process.test.ts
+      - name: Collect Windows third-party materials
+        run: node tools/collect-third-party-materials.mjs --platform win32 --artifacts build/windows-native-bundle --output build/release-materials
+      - name: Stage native bytes and notices for the package
+        run: node tools/distribution/prepare-materials.mjs win32 build/windows-native-bundle build/release-materials
+      - name: Locate makensis
+        shell: pwsh
+        run: |
+          $candidates = @(
+            "$env:ProgramFiles\NSIS\makensis.exe",
+            "${env:ProgramFiles(x86)}\NSIS\makensis.exe"
+          )
+          $found = $candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+          if (-not $found) { throw "makensis.exe was not installed" }
+          "MAKENSIS=$found" >> $env:GITHUB_ENV
+      - name: Build the per-user NSIS installer and portable ZIP from prepared resources
+        run: npm run dist:windows -- --resources build/distribution-resources/win32
+      - name: Verify checksums, sizes, PE resources and packaged contract
+        run: npm run dist:verify -- --platform win32
+      - name: Install, run packaged acceptance, prove locked-uninstall failure, uninstall
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem dist/release -Filter 'Audivane-Setup-*.exe' | Select-Object -First 1
+          if (-not $installer) { throw "NSIS installer was not produced" }
+          pwsh -NoProfile -File tools/distribution/windows-install-check.ps1 `
+            -Installer $installer.FullName -RepoRoot $PWD -TestLockedUninstall
+      - name: Upload Windows release artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audivane-windows-x64
+          path: |
+            dist/release/Audivane-Setup-*.exe
+            dist/release/Audivane-*-win32-x64.zip
+            dist/release/SHA256SUMS-windows.txt
+            dist/release/release-manifest-windows.json
+          if-no-files-found: ignore

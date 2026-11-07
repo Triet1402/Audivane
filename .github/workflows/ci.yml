@@ -1,0 +1,129 @@
+name: ci
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  OPENBLAS_NUM_THREADS: "1"
+  OMP_NUM_THREADS: "1"
+
+jobs:
+  production-typescript:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install native build, Xvfb and AppArmor tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config curl xz-utils git xvfb apparmor \
+            meson ninja-build cmake
+      - name: Install workspace dependencies
+        run: npm ci
+      - name: Check LDAC WASM allocation failure cleanup
+        run: |
+          cc -std=c11 -Wall -Wextra -Wno-unused-parameter -Werror \
+            -Itools/test/ldac-wasm-lifecycle \
+            tools/test/ldac-wasm-lifecycle/lifecycle_test.c tools/ldac_wasm.c \
+            -Wl,--wrap=malloc,--wrap=calloc,--wrap=free \
+            -o "${RUNNER_TEMP}/ldac-wasm-lifecycle"
+          "${RUNNER_TEMP}/ldac-wasm-lifecycle"
+      # Reuse the pinned native builds used by native-codecs. FFmpeg supplies
+      # liblc3-driven LC3 plus the other codec encoders; LDAC is a separate helper.
+      - name: Cache pinned codec builds
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ runner.temp }}/abx-ffmpeg-build
+            ${{ runner.temp }}/abx-ldac-build
+          key: native-codecs-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/build_ffmpeg.sh', 'tools/build_ldac_helper.sh', 'tools/ldac_helper.c') }}
+      - name: Build FFmpeg with LC3 and the LDAC helper
+        env:
+          BUILD_DIR: ${{ runner.temp }}/abx-ffmpeg-build
+          LDAC_BUILD_DIR: ${{ runner.temp }}/abx-ldac-build
+        run: |
+          tools/build_ffmpeg.sh
+          tools/build_ldac_helper.sh
+      # The helper downloads matching distro GTK packages into build/ only.
+      # tools/test-desktop.mjs adds that directory to LD_LIBRARY_PATH.
+      - name: Install local GTK runtime libraries
+        run: bash tools/setup-desktop-host-libs.sh
+      - name: Install headless Chromium and system dependencies
+        run: npx playwright install --with-deps chromium
+      # Generate before attaching so both the Electron executable and the
+      # unpacked package path in the profile already exist. This grants only
+      # user namespaces to those executables; it never disables the sandbox.
+      - name: Build unpacked package and install executable-specific AppArmor profile
+        run: |
+          npm run package:desktop
+          node tools/desktop-apparmor-profile.mjs > build/codec-abx-desktop.apparmor
+          cat build/codec-abx-desktop.apparmor
+          sudo install -m 0644 build/codec-abx-desktop.apparmor /etc/apparmor.d/codec-abx-desktop
+          sudo apparmor_parser -r /etc/apparmor.d/codec-abx-desktop
+      - name: Required production lane
+        run: npm run verify:production
+
+  # The mandatory (unfiltered) browser tests include supplemental-codecs.spec.ts
+  # and preparation-lab.spec.ts, whose assertions require an eleven-codec build:
+  # the supplemental LC3/LDAC modules are the real pinned WASM binaries from
+  # gitignored third_party/wasm/bin. A plain checkout cannot satisfy them, so
+  # this job builds from the pinned codec sources (tools/build_codec_wasm.sh,
+  # same liblc3/libldac sources as the native tier, no sudo) BEFORE test:browser.
+  # emsdk and build intermediates are cached; the build script re-verifies the
+  # pinned checksums and re-installs the artifacts on every run, so a cache miss
+  # still produces the assets from a truly fresh runner.
+  browser-codecs:
+    runs-on: ubuntu-24.04
+    # Fresh (cache-miss) runners download the entire emsdk toolchain before
+    # compiling; keep room for that plus the full browser suite.
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install workspace dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y curl git
+          npm ci
+      # Only intermediates are cached (emsdk install, source clones/tarballs).
+      # The build always recompiles, re-verifies the pinned inputs and rewrites
+      # third_party/wasm/bin, so restored caches cannot publish stale assets.
+      - name: Cache supplemental WASM build intermediates
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ runner.temp }}/abx-wasm-build
+            ${{ runner.temp }}/abx-emsdk
+          key: supplemental-wasm-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/build_codec_wasm.sh', 'tools/lc3_wasm.c', 'tools/ldac_wasm.c', 'tools/build_ffmpeg.sh', 'tools/build_ldac_helper.sh') }}
+      - name: Build the pinned supplemental LC3/LDAC WASM codecs
+        env:
+          CODEC_WASM_BUILD_DIR: ${{ runner.temp }}/abx-wasm-build
+          CODEC_WASM_EMSDK_DIR: ${{ runner.temp }}/abx-emsdk
+        run: tools/build_codec_wasm.sh
+      # Do not spend the mandatory run time serving a partial asset set: every
+      # module must exist, be a real WebAssembly binary and carry provenance.
+      - name: Verify supplemental WASM assets before the mandatory browser tests
+        run: |
+          test -s third_party/wasm/VERSION.txt
+          cat third_party/wasm/VERSION.txt
+          for module in lc3 ldac; do
+            (cd third_party/wasm/bin && sha256sum --check "${module}_codec.sha256")
+            test -s "third_party/wasm/bin/${module}_codec.js"
+            test -s "third_party/wasm/bin/${module}_codec.wasm"
+            test "$(head -c 4 "third_party/wasm/bin/${module}_codec.wasm" | od -An -tx1 | tr -d ' \n')" = "0061736d"
+            sha256sum "third_party/wasm/bin/${module}_codec.wasm"
+          done
+      - name: Install headless Chromium and its system dependencies
+        run: npx playwright install --with-deps chromium
+      - name: Check TypeScript and real native preparation
+        run: npm run check:ts
+      - name: Check real browser WASM in development and production builds
+        run: npm run test:browser

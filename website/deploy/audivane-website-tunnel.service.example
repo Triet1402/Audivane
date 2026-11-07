@@ -1,0 +1,26 @@
+# Cloudflare Tunnel service — template only.
+#
+# Copy to ~/.config/systemd/user/audivane-website-tunnel.service. The real
+# tunnel configuration and credentials stay in ~/.cloudflared/ and must never
+# be committed. Create the tunnel and write that configuration first; see
+# website/README.md.
+#
+# This unit makes outbound connections only. It does not open an inbound port.
+# PATH assumes cloudflared is in ~/.local/bin; adjust it if installed elsewhere.
+
+[Unit]
+Description=Cloudflare Tunnel for audivane.app
+After=network-online.target audivane-website.service
+Wants=network-online.target audivane-website.service
+
+[Service]
+Type=simple
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/env cloudflared tunnel --config %h/.cloudflared/audivane-website.yml --no-autoupdate run
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=default.target

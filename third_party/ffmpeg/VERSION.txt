@@ -1,0 +1,51 @@
+FFmpeg:       9.0.2 (stable release)
+Source:       https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz
+SHA-256:      8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e
+Build date:   2026-11-04 (UTC)
+built by tools/build_ffmpeg.sh
+Host:         x86_64, gcc 13.3.0
+Job flags:    make -j (nproc), --disable-x86asm (no nasm/yasm on build host)
+Binary type:  ELF PIE, statically linked codec libs, dynamically linked glibc
+Build baseline: Ubuntu 24.04.3 LTS (x86_64, glibc 2.39)
+Baseline method: Ubuntu 24.04.3 base rootfs under proot; host packages untouched
+Baseline toolchain: gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0; GNU ld (GNU Binutils for Ubuntu) 2.42
+Binary SHA-256 (ffmpeg):  38c2653c10dd2bd8e71ada87d1c5eafb9477c1e6805c725e175c90f9b9b737ee
+Binary SHA-256 (ffprobe): 5e8b313fec0c7aae2453d7bf366e971fdf9822f96813f7400e91b9386dca3ae3
+Linker:       GNU ld (GNU Binutils for Ubuntu) 2.42
+Prefix used:  /var/tmp/audivane-ffmpeg/prefix
+
+Exact ./configure line (run from ffmpeg-9.0.2/):
+./configure --prefix=/var/tmp/audivane-ffmpeg/prefix --pkg-config-flags=--static --extra-cflags=-I/var/tmp/audivane-ffmpeg/prefix/include --extra-ldflags=-L/var/tmp/audivane-ffmpeg/prefix/lib '--extra-libs=-lm -lpthread' --disable-doc --disable-debug --disable-x86asm --disable-shared --enable-static --disable-ffplay --disable-zlib --disable-bzlib --disable-lzma --enable-liblc3 --enable-libsoxr --enable-libopus --enable-libvorbis --enable-libmp3lame --enable-libtwolame
+
+Static dependencies (all built from source into /var/tmp/audivane-ffmpeg/prefix):
+  liblc3      1.1.3   https://github.com/google/liblc3
+  libsoxr     0.1.3   https://github.com/chirlu/soxr
+  libogg      1.3.5   https://downloads.xiph.org/releases/ogg/
+  libvorbis   1.3.7   https://downloads.xiph.org/releases/vorbis/
+  libopus     1.5.2   https://downloads.xiph.org/releases/opus/
+  libmp3lame  3.100   https://sourceforge.net/projects/lame/
+  libtwolame  0.4.0   https://sourceforge.net/projects/twolame/
+
+Static dependency archive SHA-256:
+  ffmpeg      8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e   https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz
+  liblc3      276752ff54ce6a77d54ec133397b9d7e71f90caf3d9afa32d8b0e891b8ecb8af   https://github.com/google/liblc3/archive/refs/tags/v1.1.3.tar.gz
+  libsoxr     db6ca1b1e8405c6ef92f8294fc123d910abf0a114003b3f0f13fa57a95fd62d0   https://github.com/chirlu/soxr/archive/refs/tags/0.1.3.tar.gz
+  libogg      c4d91be36fc8e54deae7575241e03f4211eb102afb3fc0775fbbc1b740016705   https://downloads.xiph.org/releases/ogg/libogg-1.3.5.tar.xz
+  libvorbis   b33cc4934322bcbf6efcbacf49e3ca01aadbea4114ec9589d1b1e9d20f72954b   https://downloads.xiph.org/releases/vorbis/libvorbis-1.3.7.tar.xz
+  libopus     65c1d2f78b9f2fb20082c38cbe47c951ad5839345876e46941612ee87f9a7ce1   https://downloads.xiph.org/releases/opus/opus-1.5.2.tar.gz
+  libmp3lame  ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e   https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
+  libtwolame  cc35424f6019a88c6f52570b63e1baf50f62963a3eac52a03a800bb070d7c87d   https://downloads.sourceforge.net/twolame/twolame-0.4.0.tar.gz
+
+Enabled codecs include (native + external):
+  liblc3, native aptx, aptx_hd, sbc, aac, plus libopus, libvorbis,
+  libmp3lame, libtwolame.
+
+LC3 raw format: muxer/demuxer name is "lc3" (Bluetooth LC3 test-suite
+bitstream with an 18-byte header, or 20 bytes in high-resolution mode;
+each packet is prefixed by a 16-bit little-endian length). Encoder sample
+rates: 8000, 16000, 24000, 32000, 48000, 96000. Frame durations: 2.5, 5,
+7.5, 10 ms.
+
+Canonical commands (48 kHz stereo):
+  ffmpeg -i input.wav -c:a liblc3 -b:a 96k -f lc3 output.lc3
+  ffmpeg -f lc3 -i output.lc3 -c:a pcm_s16le output.wav

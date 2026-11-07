@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# The browser app under /demo/ is noindexed by its own build
+# (meta robots + host header; see website/INTEGRATION.md).
+
+Sitemap: https://audivane.app/sitemap-index.xml

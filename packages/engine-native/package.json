@@ -1,0 +1,17 @@
+{
+  "name": "@codec-abx/engine-native",
+  "version": "0.1.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/typescript/index.ts",
+    "./typescript": "./src/typescript/index.ts"
+  },
+  "dependencies": {
+    "@codec-abx/contracts": "0.1.0",
+    "@codec-abx/measurements": "0.1.0",
+    "@codec-abx/preparation-policy": "0.1.0",
+    "@codec-abx/preparation": "0.1.0"
+  }
+}

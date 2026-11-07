@@ -1,0 +1,41 @@
+build/
+dist/
+*.spec.bak
+uploads/*
+!uploads/.gitkeep
+examples/*.wav
+node_modules/
+test-results/
+playwright-report/
+*.tsbuildinfo
+.DS_Store
+# Vendored build artifacts: reproduce with tools/build_ffmpeg.sh and
+# tools/build_ldac_helper.sh; only the placeholders and VERSION.txt are tracked.
+third_party/ffmpeg/bin/*
+!third_party/ffmpeg/bin/.gitkeep
+third_party/ldac/bin/*
+!third_party/ldac/bin/.gitkeep
+# Supplemental browser codec WASM builds: reproduce with
+# tools/build_codec_wasm.sh; only the placeholders and VERSION.txt are tracked.
+third_party/wasm/bin/*
+!third_party/wasm/bin/.gitkeep
+
+# Local agent instructions and session notes
+AGENTS.md
+HANDOVER*.md
+
+# Local design tooling state
+.impeccable/
+
+# Local credentials and signing material
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+signing.local.json

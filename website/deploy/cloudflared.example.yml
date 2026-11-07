@@ -1,0 +1,29 @@
+# Cloudflare Tunnel ingress — template only.
+#
+# Never commit a populated copy. Create the tunnel outside the repository:
+#
+#   cloudflared tunnel login
+#   cloudflared tunnel create audivane-website
+#
+# Then copy this file to ~/.cloudflared/audivane-website.yml, replace the
+# placeholders, and set mode 0600 on it and on the credential files:
+#
+#   chmod 600 ~/.cloudflared/audivane-website.yml \
+#     ~/.cloudflared/REPLACE_WITH_TUNNEL_UUID.json ~/.cloudflared/cert.pem
+#
+# The local site must already answer on http://127.0.0.1:8088. Do not route DNS
+# until the existing audivane-landing Worker custom domain has been detached.
+
+tunnel: REPLACE_WITH_TUNNEL_UUID
+credentials-file: /home/REPLACE_WITH_USER/.cloudflared/REPLACE_WITH_TUNNEL_UUID.json
+origincert: /home/REPLACE_WITH_USER/.cloudflared/audivane-cert.pem
+metrics: 127.0.0.1:20242
+
+ingress:
+  - hostname: audivane.app
+    service: http://127.0.0.1:8088
+  # The site server must redirect www to the apex. Remove this rule (and the
+  # matching tunnel DNS route) if the redirect is handled elsewhere.
+  - hostname: www.audivane.app
+    service: http://127.0.0.1:8088
+  - service: http_status:404

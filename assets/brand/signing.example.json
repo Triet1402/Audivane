@@ -1,0 +1,16 @@
+{
+  "schema": "audivane-signing-plan-v1",
+  "enabled": false,
+  "windows": {
+    "provider": null,
+    "publisherIdentity": null,
+    "signToolPath": null,
+    "certificateFileEnvironmentVariable": "WINDOWS_CERTIFICATE_FILE",
+    "certificatePasswordEnvironmentVariable": "WINDOWS_CERTIFICATE_PASSWORD",
+    "hashes": ["sha256"],
+    "timestampServer": null
+  },
+  "linux": {
+    "checksumSignatureIdentity": null
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "audivane-landing",
+  "compatibility_date": "2026-11-06",
+  "assets": { "directory": "./public" },
+  "routes": [{ "pattern": "audivane.app", "custom_domain": true }],
+  "workers_dev": false
+}

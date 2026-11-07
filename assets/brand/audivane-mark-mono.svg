@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="title desc">
+  <title id="title">Audivane</title>
+  <desc id="desc">Two sound vanes form a split letter A, representing the two sides of a blind audio comparison.</desc>
+  <g fill="currentColor">
+    <path d="M120 40c-9 0-15 7-19 17L36 201c-2 4 0 7 5 7h36l18-40h27v-24h-16l16-40V40z"/>
+    <path d="M136 40c9 0 15 7 19 17l65 144c2 4 0 7-5 7h-36l-18-40h-27v-24h16l-16-40V40z"/>
+  </g>
+</svg>

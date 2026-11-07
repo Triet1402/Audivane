@@ -1,0 +1,26 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Page not found — Audivane"
+  description="This Audivane page does not exist. Start from the documentation, guides or downloads overview."
+>
+  <div class="section-head wrap notfound">
+    <h1>Nothing here.<br /><span class="h1-accent">Listen somewhere else.</span></h1>
+    <p class="lead">
+      This page doesn't exist — a renamed section, an old link, or an
+      artifact that hasn't been published yet.
+    </p>
+    <div class="hero-actions">
+      <a class="button" href="/docs/">Documentation</a>
+      <a class="button quiet" href="/">Home</a>
+    </div>
+    <ul class="notfound-links">
+      <li><a href="/guides/">Guides</a></li>
+      <li><a href="/downloads/">Download status</a></li>
+      <li><a href="/docs/release-status/">Release status</a></li>
+      <li><a href="/demo/">Open the demo</a></li>
+    </ul>
+  </div>
+</BaseLayout>

@@ -1,0 +1,94 @@
+{
+  "schema": "audivane-windows-build-tools-v1",
+  "scope": "Linux cross-produced Windows candidate, unexecuted on Windows",
+  "packages": [
+    {
+      "package": "binutils-mingw-w64-x86-64",
+      "version": "2.41.90.20240122-1ubuntu1+11.4",
+      "sourcePackage": "binutils-mingw-w64 (11.4)",
+      "file": "binutils-mingw-w64-x86-64_2.41.90.20240122-1ubuntu1+11.4_amd64.deb",
+      "sha256": "28bfabbf64a68813a56360bca056072af9ff71ef4090a4b8a8a085afcda3e4dd",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/b/binutils-mingw-w64/binutils-mingw-w64-x86-64_2.41.90.20240122-1ubuntu1+11.4_amd64.deb"
+    },
+    {
+      "package": "gcc-mingw-w64-base",
+      "version": "13.2.0-6ubuntu1+26.1",
+      "sourcePackage": "gcc-mingw-w64 (26.1)",
+      "file": "gcc-mingw-w64-base_13.2.0-6ubuntu1+26.1_amd64.deb",
+      "sha256": "a30c07e807e9874ea93909448c5d6d37f9569ebe60ad32de8e490aad198538a3",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-base_13.2.0-6ubuntu1+26.1_amd64.deb"
+    },
+    {
+      "package": "gcc-mingw-w64-x86-64-posix-runtime",
+      "version": "13.2.0-6ubuntu1+26.1",
+      "sourcePackage": "gcc-mingw-w64 (26.1)",
+      "file": "gcc-mingw-w64-x86-64-posix-runtime_13.2.0-6ubuntu1+26.1_amd64.deb",
+      "sha256": "aca6b438e0b55b11cedcf1170a1ee26e7979e34192e34f6e6389e560908a5bfc",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64-posix-runtime_13.2.0-6ubuntu1+26.1_amd64.deb"
+    },
+    {
+      "package": "gcc-mingw-w64-x86-64-posix",
+      "version": "13.2.0-6ubuntu1+26.1",
+      "sourcePackage": "gcc-mingw-w64 (26.1)",
+      "file": "gcc-mingw-w64-x86-64-posix_13.2.0-6ubuntu1+26.1_amd64.deb",
+      "sha256": "0855fa1d4a618550faac3a3e4352aa3226833b28184ad3c3b496a68a22c4eda2",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64-posix_13.2.0-6ubuntu1+26.1_amd64.deb"
+    },
+    {
+      "package": "gcc-mingw-w64-x86-64-win32-runtime",
+      "version": "13.2.0-6ubuntu1+26.1",
+      "sourcePackage": "gcc-mingw-w64 (26.1)",
+      "file": "gcc-mingw-w64-x86-64-win32-runtime_13.2.0-6ubuntu1+26.1_amd64.deb",
+      "sha256": "7ac09bc7f283f1148c8e1697373db069c1d4364a9f5fa58bb66c8a93760b8b65",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64-win32-runtime_13.2.0-6ubuntu1+26.1_amd64.deb"
+    },
+    {
+      "package": "gcc-mingw-w64-x86-64-win32",
+      "version": "13.2.0-6ubuntu1+26.1",
+      "sourcePackage": "gcc-mingw-w64 (26.1)",
+      "file": "gcc-mingw-w64-x86-64-win32_13.2.0-6ubuntu1+26.1_amd64.deb",
+      "sha256": "80e1430303e1a619fc9cfc66225893d81486e52801e1916b712d8111d100ae38",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64-win32_13.2.0-6ubuntu1+26.1_amd64.deb"
+    },
+    {
+      "package": "gcc-mingw-w64-x86-64",
+      "version": "13.2.0-6ubuntu1+26.1",
+      "sourcePackage": "gcc-mingw-w64 (26.1)",
+      "file": "gcc-mingw-w64-x86-64_13.2.0-6ubuntu1+26.1_all.deb",
+      "sha256": "e36ec8ed03345027edee08041d993b278e05b81e60beb19292cee24dac97c775",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64_13.2.0-6ubuntu1+26.1_all.deb"
+    },
+    {
+      "package": "mingw-w64-common",
+      "version": "11.0.1-3build1",
+      "sourcePackage": "mingw-w64",
+      "file": "mingw-w64-common_11.0.1-3build1_all.deb",
+      "sha256": "4a42fd30fbc3838c58c929d8a4882682fc12408bb7a0e6cafa913c0f0a57c187",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/m/mingw-w64/mingw-w64-common_11.0.1-3build1_all.deb"
+    },
+    {
+      "package": "mingw-w64-x86-64-dev",
+      "version": "11.0.1-3build1",
+      "sourcePackage": "mingw-w64",
+      "file": "mingw-w64-x86-64-dev_11.0.1-3build1_all.deb",
+      "sha256": "018480a62907fcca19c6bf2975ae01f5c92c23dee8c3cf7a8355c10bf7d42c6f",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/m/mingw-w64/mingw-w64-x86-64-dev_11.0.1-3build1_all.deb"
+    },
+    {
+      "package": "nsis-common",
+      "version": "3.10-2ubuntu2",
+      "sourcePackage": "nsis",
+      "file": "nsis-common_3.10-2ubuntu2_all.deb",
+      "sha256": "85235ccadf16de6ea9d9893f06e37e4767fba23c18030a0b6f29e484adb57bf8",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis-common_3.10-2ubuntu2_all.deb"
+    },
+    {
+      "package": "nsis",
+      "version": "3.10-2ubuntu2",
+      "sourcePackage": "nsis",
+      "file": "nsis_3.10-2ubuntu2_amd64.deb",
+      "sha256": "a467b73f6498fa77eb7f5e69dbb3a740bff67fb5a136b74e2d85d5f077478538",
+      "url": "https://archive.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis_3.10-2ubuntu2_amd64.deb"
+    }
+  ]
+}
