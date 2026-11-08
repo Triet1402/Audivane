@@ -1,17 +1,17 @@
 ---
 title: Release status
-description: Audivane 0.2.0 release preparation and current desktop downloads.
+description: Audivane 0.2.0 downloads, changes and verification status.
 order: 4
 updated: 2026-11-08
 source: docs/release-notes-0.2.0.md
 source_sha256: 54245686e1a21b9ccc580cbc5ff3f885227ade15841bfad94fd7cfc5aecb3504
 ---
 
-## 0.2.0 — in preparation
+## 0.2.0 — available
 
-The updated [browser app](/demo/) is available now. Desktop 0.2.0 packages are
-being prepared for GitHub Releases. Until publication, the
-[downloads page](/downloads/) continues to offer 0.1.0.
+Audivane 0.2.0 is [published on GitHub](https://github.com/Triet1402/Audivane/releases/tag/0.2.0).
+Get the desktop app from the [downloads page](/downloads/) or use the updated
+[browser app](/demo/).
 
 ### What changes
 
@@ -22,7 +22,7 @@ being prepared for GitHub Releases. Until publication, the
 - Audio previews and WAV downloads after a test ends.
 - One results download containing the listening record and full diagnostics.
 
-### Planned downloads
+### Downloads
 
 | Platform | Format |
 | --- | --- |
@@ -35,8 +35,8 @@ published packages. macOS and AppImage downloads are not planned for 0.2.0.
 
 ### Verification
 
-Preparation checks version consistency, TypeScript compilation, package
-structure and checksums. No new full installed-platform, upgrade or physical
+Release preparation passed version consistency, TypeScript compilation, package
+structure and checksum checks. No new full installed-platform, upgrade or physical
 listening pass is claimed. Previous 0.1.0 checks apply to those earlier artifacts.
 Windows builds remain unsigned. Audio processing stays local, and the existing
 preparation gates and fixed-trial scoring remain in place.

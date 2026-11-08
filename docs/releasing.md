@@ -1,9 +1,10 @@
 # Audivane release preparation
 
-Status: **0.2.0 release preparation**. Version `0.2.0` is assigned across the
+Status: **0.2.0 published**. Version `0.2.0` is assigned across the
 workspace manifests, internal dependencies, lockfiles and application metadata.
-The latest published release remains `0.1.0` until the new GitHub release is
-published. See [0.2.0 release notes](release-notes-0.2.0.md).
+The latest published release is [0.2.0](https://github.com/Triet1402/Audivane/releases/tag/0.2.0),
+built from commit `0c61e73d377c8225f5e03054f18304758909e00e` on `main`.
+See [0.2.0 release notes](release-notes-0.2.0.md).
 
 ## Release route
 
