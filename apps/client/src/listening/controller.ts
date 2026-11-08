@@ -232,7 +232,6 @@ export class ListeningController {
   #generation = 0;
   #disposed = false;
   #disposal: Promise<void> | null = null;
-  #preAnswerPlayIntent = false;
   #restorePlayIntent = false;
   /** The current pending load belongs to a confirmed-answer continuation. */
   #pendingContinuation = false;
@@ -331,7 +330,6 @@ export class ListeningController {
   #handleFatal(failure: DesktopRuntimeFailure): void {
     if (this.#disposed) return;
     this.#generation += 1;
-    this.#preAnswerPlayIntent = false;
     this.#restorePlayIntent = false;
     this.#pendingContinuation = false;
     this.#bindingUnconfirmed = false;
@@ -755,7 +753,6 @@ export class ListeningController {
     }
 
     const generation = ++this.#generation;
-    this.#preAnswerPlayIntent = false;
     this.#restorePlayIntent = false;
     this.#pendingContinuation = false;
     this.#emit({
@@ -848,11 +845,7 @@ export class ListeningController {
       answered: false,
       feedback: null,
       pendingAnswer: null,
-      notice: continuation
-        ? "Loading the next A/B/X set while the current audio keeps its clock."
-        : trial.kind === "calibration"
-          ? "Calibration trial staged. Its X is private; playback starts paused."
-          : "Scored trial staged; playback starts paused.",
+      notice: null,
     });
     let playback: PlaybackSnapshot;
     try {
@@ -934,13 +927,7 @@ export class ListeningController {
       feedback: null,
       pendingAnswer: null,
       error: null,
-      notice: continuation
-        ? playback.selectionRequired === true
-          ? playback.carryingPreviousTrial === true
-            ? "Previous trial audio is still playing. Choose A, B or X for the new trial to switch at the shared position."
-            : "Choose A, B or X to hear the new trial."
-          : null
-        : null,
+      notice: null,
     });
     if (playback.error !== null) {
       this.#restorePlayIntent = false;
@@ -1019,11 +1006,7 @@ export class ListeningController {
     this.#emit({
       busy: null,
       error: null,
-      notice: continuation && playback.selectionRequired === true
-        ? playback.carryingPreviousTrial === true
-          ? "Previous trial audio is still playing. Choose A, B or X for the new trial to switch at the shared position."
-          : "Choose A, B or X to hear the new trial."
-        : null,
+      notice: null,
     });
     if (playback.error !== null) {
       this.#restorePlayIntent = false;
@@ -1137,7 +1120,6 @@ export class ListeningController {
     // Routine submission never pauses: the immutable sounding graph and its
     // clock keep running while the answer is in flight. A paused trial stays
     // paused because there is no graph to continue.
-    if (!retry) this.#preAnswerPlayIntent = this.#state.playback.playing;
     this.#emit({
       busy: "answer",
       pendingAnswer: label,
@@ -1228,11 +1210,9 @@ export class ListeningController {
         ? snapshot.lockedAtUtc !== null
         : this.#state.planLocked,
       canExport: sameRun ? true : this.#state.canExport,
-      notice: sameRun && snapshot !== null && snapshot.lifecycle === "completed"
-        ? "Pre-registered N reached. No further trial is offered."
-        : sameRun && snapshot !== null && snapshot.lifecycle === "void"
-          ? "Calibration failed; this run is terminal void and accepts no scored trials."
-          : null,
+      notice: sameRun && snapshot !== null && snapshot.lifecycle === "void"
+        ? "Calibration failed; this run is terminal void and accepts no scored trials."
+        : null,
     });
     if (!terminal && sameRun && snapshot !== null && snapshot.lifecycle === "running" && player !== null) {
       await this.#autoAdvanceAfterAnswer(client, player, trial, label, generation);
@@ -1263,7 +1243,7 @@ export class ListeningController {
     this.#emit({
       busy: "next",
       error: null,
-      notice: "Answer saved. Staging the next trial without stopping the current graph.",
+      notice: null,
     });
     let nextTrialValue: PublicTrial;
     try {
@@ -1508,12 +1488,18 @@ export class ListeningController {
     }
   }
 
+  /** The UI reset is one explicit command: clear the run, then stage paused. */
+  async restart(): Promise<void> {
+    await this.reset();
+    if (this.#disposed || this.#state.session !== "configured" || this.#state.error !== null) return;
+    await this.start();
+  }
+
   async reset(): Promise<void> {
     const client = this.#client;
     const player = this.#player;
     if (this.#disposed || (client === null && player === null)) return;
     const generation = ++this.#generation;
-    this.#preAnswerPlayIntent = false;
     this.#restorePlayIntent = false;
     this.#pendingContinuation = false;
     this.#outputBlocked = false;
@@ -1529,7 +1515,7 @@ export class ListeningController {
       pendingAnswer: null,
       error: null,
       outputBlocked: false,
-      notice: "Stopping audio immediately and resetting the experiment run…",
+      notice: null,
     });
     if (client === null) {
       this.#emit({
@@ -1541,7 +1527,7 @@ export class ListeningController {
         planLocked: false,
         canExport: false,
         outputBlocked: false,
-        notice: "Player reset. No experiment run was active.",
+        notice: null,
       });
       return;
     }
@@ -1568,8 +1554,7 @@ export class ListeningController {
         planLocked: snapshot.lockedAtUtc !== null,
         canExport: this.#artifact !== null && preparedMatches(snapshot, this.#artifact),
         outputBlocked: false,
-        notice:
-          "Run reset: answers, feedback, plan lock and any output-route block are cleared. The verified prepared pair and gate facts are retained; staging again is explicit.",
+        notice: null,
       });
     } catch (error) {
       if (generation !== this.#generation || this.#disposed) return;
@@ -1640,9 +1625,7 @@ export class ListeningController {
         snapshot: exported.snapshot,
         session: lifecycleSession(exported.snapshot.lifecycle),
         planLocked: exported.snapshot.lockedAtUtc !== null,
-        notice: exported.reveal.redacted
-          ? "Export is redacted while the run is not terminal. Only already-answered rows are present."
-          : "Terminal export includes the runtime reveal and remains auditable with local custody limits.",
+        notice: null,
       });
       return payload;
     } catch (error) {

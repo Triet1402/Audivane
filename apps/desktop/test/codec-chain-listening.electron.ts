@@ -1,3 +1,5 @@
+import { clickRunAction } from "../../../tests/ui/run-actions.js";
+import { downloadDiagnostics } from "./diagnostic-download.js";
 import { test, expect, _electron as electron } from "@playwright/test";
 import { promises as fs } from "node:fs";
 import os from "node:os";
@@ -106,16 +108,9 @@ test("native ordered codec chain prepares, binds, plays and exports through the 
     await page.getByRole("button", { name: "Prepare native artifacts" }).click();
     await expect(page.getByText("Native artifacts ready.")).toBeVisible({ timeout: 150_000 });
 
-    const artifactText = await page
-      .locator("details", { hasText: "Raw diagnostic artifact JSON" })
-      .locator("pre")
-      .textContent();
-    const artifact = JSON.parse(artifactText ?? "{}") as {
-      request: { version: number; a: { codecId: string; bitrateKbps: number }[]; b: { codecId: string; bitrateKbps: number }[] };
-      engine: { location: string; preparationPolicy: string };
-      a: { stages?: { stageIndex: number; requested: { codecId: string; bitrateKbps: number }; actualBitrateKbps: number | null }[] };
-      b: { stages?: { stageIndex: number; requested: { codecId: string; bitrateKbps: number }; actualBitrateKbps: number | null }[] };
-    };
+    const exportedDiagnostic = await downloadDiagnostics(page, downloads);
+    const artifact = exportedDiagnostic.artifact;
+    if (artifact.request.version !== 2) throw new Error("Expected a codec chain request");
     expect(artifact.engine.location).toBe("desktop-native");
     expect(artifact.engine.preparationPolicy).toBe("aligned-gain-matched-v1");
     expect(artifact.request.version).toBe(2);
@@ -134,11 +129,9 @@ test("native ordered codec chain prepares, binds, plays and exports through the 
       expect(stage.actualBitrateKbps).not.toBeNull();
       expect(stage.actualBitrateKbps!).toBeGreaterThan(0);
     }
-    await expect(page.locator('section[aria-label="Side A stage provenance"]'))
-      .toContainText("libmp3lame");
+    expect(exportedDiagnostic.stageProvenance.a?.at(-1)?.encoder).toContain("libmp3lame");
 
     // Diagnostic JSON carries the complete ordered request and both stage arrays.
-    await page.getByRole("button", { name: "Download JSON diagnostics" }).click();
     await expect.poll(() => recent(downloads, "codec-abx-diagnostic")).not.toBeNull();
     const diagnostic = JSON.parse(
       await fs.readFile((await recent(downloads, "codec-abx-diagnostic"))!, "utf8"),
@@ -161,7 +154,7 @@ test("native ordered codec chain prepares, binds, plays and exports through the 
     await page.getByRole("button", { name: "Play", exact: true }).click();
     await expect(page.getByRole("button", { name: "Pause", exact: true })).toBeEnabled();
 
-    await page.getByRole("button", { name: "Download listening export" }).click();
+    await clickRunAction(page, "Download results");
     await expect.poll(() => recent(downloads, "codec-abx-listening")).not.toBeNull();
     const exported = JSON.parse(
       await fs.readFile((await recent(downloads, "codec-abx-listening"))!, "utf8"),
@@ -185,7 +178,7 @@ test("native ordered codec chain prepares, binds, plays and exports through the 
       .toEqual(["aac", "opus"]);
     expect(exported.playback.actualOutputSampleRate).toBeGreaterThan(0);
 
-    await page.getByRole("button", { name: "Close listening run" }).click();
+    await clickRunAction(page, "Close listening run");
     await expect(page.getByRole("button", { name: "Choose local audio…" })).toBeEnabled();
   } finally {
     await app?.close();

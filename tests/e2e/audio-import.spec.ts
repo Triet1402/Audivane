@@ -84,7 +84,7 @@ for (const format of formats) {
       });
       await configure(page, { a: "noop_passthrough", b: "noop_passthrough" });
       await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-      await expect(page.locator(".results")).toBeVisible({ timeout: 150_000 });
+      await expect(page.locator(".evidence-audio")).toBeVisible({ timeout: 150_000 });
       const { artifact } = await downloadJson(page);
       expect(artifact.sourceSha256).toBe(sha256(source));
       expect(artifact.a.delivered.channels).toBe(2);
@@ -125,7 +125,7 @@ test("32-bit integer WAV source is quantized once to canonical PCM16 with exact 
   });
   await configure(page, { a: "noop_passthrough", b: "noop_passthrough" });
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-  await expect(page.locator(".results")).toBeVisible({ timeout: 150_000 });
+  await expect(page.locator(".evidence-audio")).toBeVisible({ timeout: 150_000 });
   const { artifact } = await downloadJson(page);
   expect(artifact.sourceSha256).toBe(sha256(source));
   expect(artifact.a.delivered).toMatchObject({ sampleRate: 48_000, channels: 2, frames });
@@ -170,7 +170,7 @@ test("32-bit float WAV source preserves low-level fractions then clamps to canon
   });
   await configure(page, { a: "noop_passthrough", b: "noop_passthrough" });
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-  await expect(page.locator(".results")).toBeVisible({ timeout: 150_000 });
+  await expect(page.locator(".evidence-audio")).toBeVisible({ timeout: 150_000 });
   const { artifact } = await downloadJson(page);
   expect(artifact.sourceSha256).toBe(sha256(source));
   expect(artifact.a.delivered).toMatchObject({ sampleRate: 48_000, channels: 2, frames });
@@ -213,7 +213,7 @@ test("lossy MP3 source can be transcoded into distinct AAC and Opus sides", asyn
     await page.selectOption("#codec-a", "aac");
     await page.selectOption("#bitrate-a", "128");
     await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-    await expect(page.locator(".results")).toBeVisible({ timeout: 150_000 });
+    await expect(page.locator(".evidence-audio")).toBeVisible({ timeout: 150_000 });
     const { artifact } = await downloadJson(page);
     expect(artifact.sourceSha256).toBe(sha256(source));
     expect(artifact.a.requested.codecId).toBe("aac");
@@ -238,7 +238,7 @@ test("ten-minute AAC decoder padding survives preparation, binding and full play
     await page.locator("#source-file").setInputFiles(source);
     await configure(page, { a: "noop_passthrough", b: "noop_passthrough", policy: "aligned-gain-matched-v1" });
     await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-    await expect(page.locator(".results")).toBeVisible({ timeout: 150_000 });
+    await expect(page.locator(".evidence-audio")).toBeVisible({ timeout: 150_000 });
     const { artifact } = await downloadJson(page);
     const duration = artifact.a.delivered.frames / artifact.a.delivered.sampleRate;
     expect(duration).toBeGreaterThan(600);
@@ -265,7 +265,7 @@ test("a 96 kHz stereo track above 16 MiB retains its full length and an exact ca
     a: "noop_passthrough", b: "noop_passthrough", policy: "aligned-gain-matched-v1", canary: true,
   });
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-  await expect(page.locator(".results")).toBeVisible({ timeout: 240_000 });
+  await expect(page.locator(".evidence-audio")).toBeVisible({ timeout: 240_000 });
   const { artifact } = await downloadJson(page);
   expect(artifact.a.delivered).toMatchObject({ sampleRate: 96_000, channels: 2, frames: 45 * 96_000 });
   expect(artifact.b.delivered.frames).toBe(45 * 96_000);
@@ -297,7 +297,7 @@ test("a 601 s source beyond the former 600 s ceiling is prepared and staged with
     await page.locator("#source-file").setInputFiles(source);
     await configure(page, { a: "noop_passthrough", b: "noop_passthrough", policy: "aligned-gain-matched-v1" });
     await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-    await expect(page.locator(".results")).toBeVisible({ timeout: 600_000 });
+    await expect(page.locator(".evidence-audio")).toBeVisible({ timeout: 600_000 });
     const { artifact } = await downloadJson(page);
     expect(artifact.a.delivered).toMatchObject({ sampleRate, channels, frames: 601 * sampleRate });
     expect(artifact.b.delivered.frames).toBe(601 * sampleRate);

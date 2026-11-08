@@ -1,3 +1,4 @@
+import { clickRunAction } from "../ui/run-actions.js";
 import { expect, test, type Page } from "@playwright/test";
 
 import type { PreparedArtifact } from "@codec-abx/contracts";
@@ -190,7 +191,7 @@ test("one Prepare test click prepares, binds and stages a paused full-length tri
 
   const trial = page.locator(".listening-trial");
   await expect(trial).toBeVisible({ timeout: 180_000 });
-  await expect(page.locator("#listen-view")).toContainText("Scored trial");
+  await expect(page.getByRole("heading", { name: "Trial 1 of 8", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Play", exact: true })).toBeEnabled();
   await expect(page.locator(".stage-status")).toContainText("Paused");
   const stageAfter = (await stage.boundingBox())!.y + await page.evaluate(() => window.scrollY);
@@ -244,7 +245,7 @@ test("cancelling preparation stages nothing and leaves the primary action retrya
   await page.getByRole("button", { name: "Setup", exact: true }).click();
   await expect(page.getByRole("button", { name: "Prepare test", exact: true }))
     .toBeEnabled({ timeout: 60_000 });
-  await expect(page.locator(".results")).toHaveCount(0);
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
 
   expectNoRemoteOrUpload(guard);
   expect(pageErrors).toEqual([]);
@@ -378,7 +379,7 @@ test("the single readiness-check opt-in adds a first-10 s calibration trial and 
       .toBeLessThanOrEqual(10.001);
   }
 
-  await page.getByRole("button", { name: "Close listening run", exact: true }).click();
+  await clickRunAction(page, "Close listening run");
   await expect(page.getByRole("button", { name: "Prepare test", exact: true })).toBeVisible({
     timeout: 60_000,
   });

@@ -172,7 +172,3 @@ export function formatDuration(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds < 0) return "unknown";
   return `${seconds.toFixed(3)} s`;
 }
-
-export function shortHash(hash: string): string {
-  return hash.length > 16 ? `${hash.slice(0, 16)}…` : hash;
-}

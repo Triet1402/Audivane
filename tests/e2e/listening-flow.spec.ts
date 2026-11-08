@@ -1,3 +1,4 @@
+import { clickRunAction } from "../ui/run-actions.js";
 import { readFile } from "node:fs/promises";
 
 import { expect, test, type Page } from "@playwright/test";
@@ -334,7 +335,7 @@ async function answerMatching(page: Page, wrong = false): Promise<"A" | "B"> {
 async function downloadListeningExport(page: Page): Promise<Record<string, unknown>> {
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    page.getByRole("button", { name: "Download listening export" }).click(),
+    clickRunAction(page, "Download results"),
   ]);
   expect(download.suggestedFilename()).toMatch(/^codec-abx-listening-.*\.json$/);
   const file = await download.path();
@@ -394,7 +395,7 @@ test("fixed and blind perfect-listener runs freeze the plan, stay paused first, 
 
   // Start a real diagnostic HTML audio output, then prove the listening start
   // pauses it (not merely unmounts/revokes) and removes the competing path.
-  await page.getByRole("button", { name: "Load diagnostic sample A" }).click();
+  await page.getByRole("button", { name: "Preview A" }).click();
   await expect(page.locator("audio")).toHaveCount(1);
   const diagnosticPlaying = await page.locator("audio").first().evaluate(async (element) => {
     const media = element as HTMLAudioElement;
@@ -422,11 +423,11 @@ test("fixed and blind perfect-listener runs freeze the plan, stay paused first, 
     timeout: 120_000,
   });
   await showView(page, "Evidence");
-  await expect(page.locator(".commitment")).toHaveText(/^[0-9a-f]{64}$/);
-  await expect(page.getByText(/at least \d+ of 8 scored trials correct/)).toBeVisible();
-  await expect(page.locator(".listening-plan-facts")).toContainText("ON (excluded from scored N)");
-  await expect(page.getByRole("button", { name: "Load diagnostic sample A" })).toBeDisabled();
-  await expect(page.getByRole("button", { name: "Release artifacts and reset" })).toBeDisabled();
+  await expect(page.locator(".evidence-metrics")).toContainText("p-value");
+  await expect(page.locator(".run-record")).toContainText("Required correct");
+  await expect(page.locator(".run-record")).toContainText("Readiness check");
+  await expect(page.getByRole("button", { name: "Preview A" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Clear prepared audio" })).toBeDisabled();
   await expect(page.locator(".diagnostic-audio")).toHaveCount(0);
   await showView(page, "Listen");
   // Parent diagnostic controls are disabled and guarded while the artifact is held.
@@ -473,7 +474,7 @@ test("fixed and blind perfect-listener runs freeze the plan, stay paused first, 
   expect(calibrationMatch?.token).toBe(calibrationToken);
   expect(calibrationMatch?.aEqualsB).toBe(false);
   await answerMatching(page);
-  await expect(page.getByText(/Answer [AB] accepted:/)).toBeVisible();
+  await expect(page.locator(".answer-status")).toHaveText(/^(Correct|Incorrect)$/);
   await expect(page.getByText(/Calibration passed/)).toBeVisible();
 
   // Scored 1: the run auto-advances after an accepted answer. The user paused
@@ -506,11 +507,11 @@ test("fixed and blind perfect-listener runs freeze the plan, stay paused first, 
     await expect(page.getByRole("button", { name: "Pause", exact: true })).toBeEnabled();
     await answerMatching(page);
   }
-  await expect(page.getByRole("heading", { name: /Terminal lifecycle: completed/ })).toBeVisible();
+  await expect(page.locator('.run-results[data-lifecycle="completed"]')).toBeVisible();
   await expect(page.getByRole("button", { name: "Next trial" })).toHaveCount(0);
   await showView(page, "Evidence");
-  await expect(page.getByText(/Scored progress/)).toBeVisible();
-  await expect(page.getByText(/8 \/ 8 scored · 8 correct/)).toBeVisible();
+  await expect(page.locator(".evidence-metrics")).toContainText("Accuracy");
+  await expect(page.locator(".evidence-metrics")).toContainText("100%");
 
   const completedExport = await downloadListeningExport(page);
   const completedExperiment = completedExport.experiment as {
@@ -524,40 +525,39 @@ test("fixed and blind perfect-listener runs freeze the plan, stay paused first, 
   expect(completedExperiment.snapshot.statistics.isFinal).toBe(true);
   expect(completedExperiment.snapshot.statistics.significantVerdict).toBe(true);
 
-  // --- Reset unlocks the plan but keeps the prepared pair; blind run. ---
+  // --- Close the finished run to edit the plan; reuse the prepared pair. ---
   await showView(page, "Listen");
-  await page.getByRole("button", { name: "Reset listening run" }).click();
-  await expect(page.getByText(/Run reset:/)).toBeVisible({ timeout: 60_000 });
-  await expect(page.getByText(/prepared pair and gate facts are retained/)).toBeVisible();
-  await expect(page.locator("#source-file")).toBeDisabled();
+  await clickRunAction(page, "Close listening run");
+  await showView(page, "Setup");
   await page.getByLabel("Planned scored trials N (1–1000)").fill("1");
   await page.getByLabel("Label mode", { exact: true }).selectOption("blind_random");
-  await page.getByRole("button", { name: "Apply plan and re-check gates" }).click();
+  await page.getByRole("button", { name: "Prepare test", exact: true }).click();
+  await waitForReadyTrial(page);
   await showView(page, "Evidence");
-  await expect(page.locator(".listening-plan-facts").getByText("blind_random")).toBeVisible();
-  await expect(page.getByText(/no correct count at N=1 can reach this alpha/)).toBeVisible();
+  await expect(page.locator(".run-record")).toContainText("Randomized");
+  await expect(page.locator(".run-record")).toContainText("Required correct");
   await showView(page, "Listen");
-  await page.getByRole("button", { name: "Start trial 1 (paused)" }).click();
   const blindCalibrationToken = await waitForReadyTrial(page);
   await answerMatching(page);
   await expect(page.getByText(/Calibration passed/)).toBeVisible();
   await waitForReadyTrial(page, blindCalibrationToken);
   await answerMatching(page);
-  await expect(page.getByRole("heading", { name: /Terminal lifecycle: completed/ })).toBeVisible();
+  await expect(page.locator('.run-results[data-lifecycle="completed"]')).toBeVisible();
 
   // --- Seal a partially answered run: auditable, terminal, never a final result. ---
-  await page.getByRole("button", { name: "Reset listening run" }).click();
-  await expect(page.getByText(/Run reset:/)).toBeVisible({ timeout: 60_000 });
+  await clickRunAction(page, "Close listening run");
+  await showView(page, "Setup");
   await page.getByLabel("Planned scored trials N (1–1000)").fill("2");
-  await page.getByRole("button", { name: "Apply plan and re-check gates" }).click();
-  await page.getByRole("button", { name: "Start trial 1 (paused)" }).click();
+  await page.getByRole("button", { name: "Prepare test", exact: true }).click();
+  await waitForReadyTrial(page);
   await waitForReadyTrial(page);
   await answerMatching(page);
   await expect(page.getByText(/Calibration passed/)).toBeVisible();
-  await page.getByRole("button", { name: "Seal run (not a final result)" }).click();
-  await expect(page.getByRole("heading", { name: /Terminal lifecycle: sealed/ })).toBeVisible({
+  await page.getByRole("button", { name: "End test", exact: true }).click();
+  await expect(page.locator(".run-record h2")).toContainText("Test ended early", {
     timeout: 60_000,
   });
+  await showView(page, "Listen");
   const sealedExport = await downloadListeningExport(page);
   const sealedExperiment = sealedExport.experiment as {
     reveal: { redacted: boolean; secretHex: string | null };
@@ -571,14 +571,14 @@ test("fixed and blind perfect-listener runs freeze the plan, stay paused first, 
   await expect(page.getByRole("button", { name: "Next trial" })).toHaveCount(0);
 
   // --- Reset + fail calibration -> terminal void, then release to new source. ---
-  await page.getByRole("button", { name: "Reset listening run" }).click();
-  await expect(page.getByText(/Run reset:/)).toBeVisible({ timeout: 60_000 });
+  await clickRunAction(page, "Close listening run");
+  await showView(page, "Setup");
   await page.getByLabel("Planned scored trials N (1–1000)").fill("1");
-  await page.getByRole("button", { name: "Apply plan and re-check gates" }).click();
-  await page.getByRole("button", { name: "Start trial 1 (paused)" }).click();
+  await page.getByRole("button", { name: "Prepare test", exact: true }).click();
+  await waitForReadyTrial(page);
   await waitForReadyTrial(page);
   await answerMatching(page, true);
-  await expect(page.getByRole("heading", { name: /Terminal lifecycle: void/ })).toBeVisible();
+  await expect(page.locator('.run-results[data-lifecycle="void"]')).toBeVisible();
   await expect(page.getByText(/Calibration failed/).first()).toBeVisible();
   await expect(page.getByRole("button", { name: "Next trial" })).toHaveCount(0);
   const voidExport = await downloadListeningExport(page);
@@ -591,10 +591,10 @@ test("fixed and blind perfect-listener runs freeze the plan, stay paused first, 
   expect(voidExperiment.reveal.secretHex).toMatch(/^[0-9a-f]{64}$/);
   expect(voidExperiment.snapshot.statistics.significantVerdict).toBe(false);
 
-  await page.getByRole("button", { name: "Reset listening run" }).click();
-  await expect(page.getByText(/Run reset:/)).toBeVisible({ timeout: 60_000 });
+  await clickRunAction(page, "Reset listening run");
+  await waitForReadyTrial(page);
   await expect(page.locator("#source-file")).toBeDisabled();
-  await page.getByRole("button", { name: "Close listening run" }).click();
+  await clickRunAction(page, "Close listening run");
   await expect(page.getByRole("button", { name: "Prepare test", exact: true })).toBeVisible({
     timeout: 60_000,
   });
@@ -653,17 +653,16 @@ test("an unusable canary blocks calibration, explicit disable works, load failur
   await expect(page.locator(".warning[role=alert]").filter({ hasText: /retained canary material is not usable/ }))
     .toBeVisible();
   await expect(page.locator(".listening-trial")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Start trial 1 (paused)" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Start trial 1 (paused)" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Disable calibration explicitly for this plan" }).first())
     .toBeEnabled();
 
+  await testApi(page, "armCorruptNextRead");
   await page.getByRole("button", { name: "Disable calibration explicitly for this plan" }).first().click();
   await expect(page.locator("#listen-view").getByText(/explicitly OFF/)).toBeVisible({ timeout: 60_000 });
   await expect(page.locator("#listen-view").getByText(/not-configured/)).toBeVisible();
 
-  // Corrupt one read reply: the load must fail atomically, then retry the same token.
-  await testApi(page, "armCorruptNextRead");
-  await page.getByRole("button", { name: "Start trial 1 (paused)" }).click();
+  // Recovery stages immediately; a corrupt read must fail atomically and retry the same token.
   await expect(page.getByText(/failed to load atomically/).first()).toBeVisible({ timeout: 60_000 });
   const failedToken = await currentToken(page);
   expect(failedToken).not.toBeNull();
@@ -673,7 +672,7 @@ test("an unusable canary blocks calibration, explicit disable works, load failur
   expect(retriedToken).toBe(failedToken);
   await expect(page.getByText(/failed to load atomically/)).toHaveCount(0);
   await answerMatching(page);
-  await expect(page.getByText(/Answer [AB] accepted:/)).toBeVisible();
+  await expect(page.locator(".answer-status")).toHaveText(/^(Correct|Incorrect)$/);
 
   // A delayed (held) next-trial load completes atomically after release.
   const calibrationAnsweredToken = await currentToken(page);
@@ -682,28 +681,29 @@ test("an unusable canary blocks calibration, explicit disable works, load failur
   await expect.poll(async () => Number(await testApi(page, "heldCount"))).toBeGreaterThan(0);
   await testApi(page, "releaseHeld");
   const delayedToken = await waitForReadyTrial(page, calibrationAnsweredToken ?? undefined);
-  await expect(page.getByText(/Answer [AB] accepted:/)).toHaveCount(1);
+  await expect(page.locator(".answer-status")).toHaveText(/^(Correct|Incorrect)$/);
   await testApi(page, "armHoldNextRead");
   await answerMatching(page);
-  await expect(page.getByText(/Answer [AB] accepted:/)).toBeVisible();
+  await expect(page.locator(".answer-status")).toHaveText(/^(Correct|Incorrect)$/);
 
   // Hold the following X read; reset must stop immediately and ignore the late reply.
   await expect.poll(async () => Number(await testApi(page, "heldCount"))).toBeGreaterThan(0);
   const beforeReset = await testApi(page, "lastReadToken");
   expect(beforeReset).not.toBe(delayedToken);
-  await page.getByRole("button", { name: "Reset listening run" }).click();
-  await expect(page.getByText(/Run reset:/)).toBeVisible({ timeout: 60_000 });
+  await clickRunAction(page, "Reset listening run");
+  await waitForReadyTrial(page);
   const afterReset = await currentToken(page);
-  expect(afterReset).toBeNull();
+  expect(afterReset).not.toBeNull();
+  expect(afterReset).not.toBe(beforeReset);
   expect(beforeReset).not.toBeNull();
   // Releasing the late read cannot resurrect a trial or feedback after reset.
   await testApi(page, "releaseHeld");
   await page.waitForTimeout(250);
-  expect(await currentToken(page)).toBeNull();
-  await expect(page.getByText(/Answer [AB] accepted:/)).toHaveCount(0);
-  await expect(page.locator(".listening-trial")).toHaveCount(0);
+  expect(await currentToken(page)).toBe(afterReset);
+  await expect(page.locator(".answer-status")).toBeEmpty();
+  await expect(page.locator(".listening-trial")).toHaveCount(1);
 
-  await page.getByRole("button", { name: "Close listening run" }).click();
+  await clickRunAction(page, "Close listening run");
   await expect(page.getByRole("button", { name: "Prepare test", exact: true })).toBeEnabled({
     timeout: 60_000,
   });
@@ -782,16 +782,15 @@ test("raw diagnostic artifact stays diagnostic-only, then the primary prepare te
   await primary.click();
   await expect(page.locator(".listening-trial")).toBeVisible({ timeout: 180_000 });
   await showView(page, "Evidence");
-  await expect(page.locator(".validity")).toContainText("delivered-validity-v2");
 
   const diagnostic = await downloadJson(page);
   expect(diagnostic.artifact.request.preparationPolicy).toBe("aligned-gain-matched-v1");
   expect(diagnostic.artifact.request.canaryEnabled).toBe(true);
   expect(diagnostic.artifact.validity?.policy).toBe("delivered-validity-v2");
   expect(diagnostic.artifact.canary).toBeTruthy();
-  await expect(page.locator(".listening-plan-facts")).toContainText("ON (excluded from scored N)");
+  await expect(page.locator(".run-record")).toContainText("Readiness check");
 
-  await page.getByRole("button", { name: "Close listening run", exact: true }).click();
+  await clickRunAction(page, "Close listening run");
   await expect(page.getByRole("button", { name: "Prepare test", exact: true })).toBeVisible({
     timeout: 60_000,
   });
@@ -815,11 +814,13 @@ test("a failed first binding exposes recovery and can retry without losing the p
   await expect(page.getByRole("button", { name: "Retry/check listening preparation", exact: true })).toBeVisible();
   await expect(page.locator(".listening-trial")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Play", exact: true })).toBeDisabled();
-  await expect(page.getByRole("button", { name: "Download listening export", exact: true })).toBeDisabled();
+  await showView(page, "Evidence");
+  await page.getByText("Files and diagnostics", { exact: true }).click();
+  await expect(page.getByRole("button", { name: "Download results", exact: true })).toBeDisabled();
   await page.getByRole("button", { name: "Retry/check listening preparation", exact: true }).click();
   await expect(page.getByRole("button", { name: "Play", exact: true })).toBeEnabled();
   await waitForReadyTrial(page);
-  await page.getByRole("button", { name: "Close listening run", exact: true }).click();
+  await clickRunAction(page, "Close listening run");
   await expect(page.locator("#source-file")).toBeEnabled();
   await expect(page.locator(".file-summary")).toContainText("binding-recovery.wav");
   expectNoRemoteOrUpload(guard);

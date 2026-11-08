@@ -98,38 +98,30 @@ export function Sidebar(props: SidebarProps): JSX.Element {
               Choose local audio…
             </button>
           ) : (
-            <>
-              <label className="file-picker" htmlFor="source-file">Audio file</label>
-              <input
-                id="source-file"
-                ref={props.fileInputRef}
-                type="file"
-                accept=".wav,.flac,.mp3,.m4a,.mp4,.aac,.ogg,.oga,.opus,audio/wav,audio/flac,audio/x-flac,audio/mpeg,audio/mp4,audio/x-m4a,audio/aac,audio/ogg,audio/opus"
-                aria-describedby="source-limit-line"
-                disabled={props.sourceDisabled}
-                onChange={props.onSelectFile}
-              />
-            </>
+            <input
+              id="source-file"
+              ref={props.fileInputRef}
+              aria-label="Audio file"
+              type="file"
+              accept=".wav,.flac,.mp3,.m4a,.mp4,.aac,.ogg,.oga,.opus,audio/wav,audio/flac,audio/x-flac,audio/mpeg,audio/mp4,audio/x-m4a,audio/aac,audio/ogg,audio/opus"
+              aria-describedby="source-limit-line"
+              disabled={props.sourceDisabled}
+              onChange={props.onSelectFile}
+            />
           )}
         </div>
-        <p className="file-summary" aria-live="polite">
-          {props.sourceName !== null
-            ? `${props.sourceName}${props.sourceSize === null ? "" : ` · ${props.sourceSize}`}`
-            : "No file selected."}
-        </p>
+        {props.sourceName !== null ? (
+          <p className="file-summary" aria-live="polite">
+            {props.sourceName}{props.sourceSize === null ? "" : ` · ${props.sourceSize}`}
+          </p>
+        ) : null}
         <p className="side-note" id="source-limit-line">
           Up to 30 min · 512 MiB · 32-bit input
         </p>
         <details className="source-limits">
           <summary>Formats and limits</summary>
           <p className="side-note">
-            WAV, FLAC, MP3, AAC, M4A, Ogg and Opus. Mono or stereo source keeps
-            its decoded channels and rate. Input accepts 32-bit source audio up
-            to 30 min and 512 MiB; final listening delivery remains canonical
-            PCM16 WAV at the selected session rate.
-            {props.desktop
-              ? " The resolved path stays in the main process; this renderer receives only a random handle, basename and size."
-              : " Decoding runs locally in FFmpeg; there is no upload or Web Audio source import."}
+            WAV, FLAC, MP3, AAC, M4A, Ogg and Opus.
           </p>
         </details>
       </section>
@@ -251,14 +243,16 @@ export function Sidebar(props: SidebarProps): JSX.Element {
         ) : null}
       </section>
 
-      <div className="side-foot">
-        <p className="side-note" role="note">
-          {props.listeningLocked
-            ? "Source, chains and plan are locked during a test."
-            : "Ready for a new comparison."}
-        </p>
-        {props.footer}
-      </div>
+      {props.listeningLocked || props.footer !== undefined ? (
+        <div className="side-foot">
+          {props.listeningLocked ? (
+            <p className="side-note" role="note">
+              Source, chains and plan are locked during a test.
+            </p>
+          ) : null}
+          {props.footer}
+        </div>
+      ) : null}
     </aside>
   );
 }

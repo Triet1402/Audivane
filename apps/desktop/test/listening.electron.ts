@@ -1,3 +1,5 @@
+import { clickRunAction } from "../../../tests/ui/run-actions.js";
+import { downloadDiagnostics } from "./diagnostic-download.js";
 import { test, expect, _electron as electron, type ElectronApplication } from "@playwright/test";
 import { promises as fs } from "node:fs";
 import os from "node:os";
@@ -130,11 +132,8 @@ test("built Electron app performs native preparation, exact-N listening, export 
     await page.getByRole("button", { name: "Prepare native artifacts" }).click();
     await expect(page.getByText("Native artifacts ready.")).toBeVisible({ timeout: 120_000 });
 
-    const artifactText = await page
-      .locator("details", { hasText: "Raw diagnostic artifact JSON" })
-      .locator("pre")
-      .textContent();
-    const artifact = JSON.parse(artifactText ?? "{}") as {
+    const exportedDiagnostic = await downloadDiagnostics(page, downloads);
+    const artifact = exportedDiagnostic.artifact as {
       engine: { engineId: string; location: string; build: string; preparationPolicy: string };
       measurements: { policy: string };
       preparation?: { policy: string };
@@ -152,7 +151,6 @@ test("built Electron app performs native preparation, exact-N listening, export 
     expect(artifact.b.actualBitrateKbps).toBeGreaterThan(0);
     expect(artifact.b.encodedSampleRate).toBe(48_000);
     expect(artifact.canary?.audio).not.toBeNull();
-    await expect(page.getByText("Applied preparation", { exact: false }).first()).toBeVisible();
     expect(await page.evaluate(() =>
       (window as unknown as { __codecAbxTestWorkers: string[] }).__codecAbxTestWorkers,
     )).toEqual([]);
@@ -163,7 +161,6 @@ test("built Electron app performs native preparation, exact-N listening, export 
     )).toEqual([]);
 
     // Diagnostic JSON is a real renderer download through the main save path.
-    await page.getByRole("button", { name: "Download JSON diagnostics" }).click();
     await expect.poll(() => recentExport(downloads, "codec-abx-diagnostic")).not.toBeNull();
     const diagnosticFile = await recentExport(downloads, "codec-abx-diagnostic");
     const diagnostic = JSON.parse(await fs.readFile(diagnosticFile!, "utf8")) as {
@@ -290,7 +287,7 @@ test("built Electron app performs native preparation, exact-N listening, export 
     await answer(calibrationToken!);
     const firstScored = await tokenAfter(calibrationToken!);
     await expect(trial).toHaveAttribute("data-kind", "scored");
-    await expect(page.getByText("Choose A, B or X", { exact: true })).toBeVisible();
+    await expect(page.locator(".stage-status")).not.toContainText("Choose A, B or X");
     await expectNoLabelSelected();
     await expect(page.getByRole("button", { name: "Answer A", exact: true })).toBeDisabled();
     await expect(page.getByRole("button", { name: "Answer B", exact: true })).toBeDisabled();
@@ -301,12 +298,12 @@ test("built Electron app performs native preparation, exact-N listening, export 
     await answer(firstScored);
     const secondScored = await tokenAfter(firstScored);
     await expect(trial).toHaveAttribute("data-kind", "scored");
-    await expect(page.getByText("Previous trial audio", { exact: true })).toBeVisible();
+    await expect(page.locator(".stage-status")).not.toContainText("Previous trial audio");
     await expectNoLabelSelected();
     await expect(page.getByRole("button", { name: "Answer A", exact: true })).toBeDisabled();
 
     // Active export stays redacted; it never reveals pending/future mappings.
-    await page.getByRole("button", { name: "Download listening export" }).click();
+    await clickRunAction(page, "Download results");
     await expect.poll(() => recentExport(downloads, "codec-abx-listening")).not.toBeNull();
     const activeFile = await recentExport(downloads, "codec-abx-listening");
     const active = JSON.parse(await fs.readFile(activeFile!, "utf8")) as {
@@ -339,11 +336,11 @@ test("built Electron app performs native preparation, exact-N listening, export 
     // activates the next token, and the final accepted answer stops playback.
     await selectAndPlay("A");
     await answer(secondScored);
-    await expect(page.getByText("Terminal lifecycle: completed")).toBeVisible();
-    await expect(page.getByText(/Reached the pre-registered N/)).toBeVisible();
+    await expect(page.locator('.run-results[data-lifecycle="completed"]')).toBeVisible();
+    await expect(page.locator(".run-results")).toContainText("2 / 2 correct");
     await expect(page.getByRole("button", { name: "Pause", exact: true })).toHaveCount(0);
 
-    await page.getByRole("button", { name: "Download listening export" }).click();
+    await clickRunAction(page, "Download results");
     await expect.poll(async () => {
       const files = (await fs.readdir(downloads))
         .filter((name) => name.includes("codec-abx-listening"))
@@ -369,19 +366,19 @@ test("built Electron app performs native preparation, exact-N listening, export 
     expect(terminal.experiment.trials.every((row) => row.correct)).toBe(true);
     expect(terminal.experiment.snapshot.statistics.scoredTrials).toBe(2);
 
-    // Reset retains the pair and unlocks the plan; explicit Seal remains
-    // terminal but is not a final result.
-    await page.getByRole("button", { name: "Reset listening run" }).click();
-    await expect(page.getByRole("button", { name: "Seal run (not a final result)" })).toBeVisible();
-    await page.getByRole("button", { name: "Seal run (not a final result)" }).click();
-    await expect(page.getByText("Terminal lifecycle: sealed")).toBeVisible();
+    // Reset retains the pair and unlocks the plan; End test seals it — terminal
+    // but not a final result.
+    await clickRunAction(page, "Reset listening run");
+    await expect(page.getByRole("button", { name: "End test" })).toBeVisible();
+    await page.getByRole("button", { name: "End test" }).click();
+    await expect(page.locator(".run-record h2")).toContainText("Test ended early");
 
-    await page.getByRole("button", { name: "Close listening run" }).click();
+    await clickRunAction(page, "Close listening run");
     await expect(page.getByRole("button", { name: "Choose local audio…" })).toBeEnabled();
 
     await page.getByRole("button", { name: "Evidence", exact: true }).click();
-    await page.getByRole("button", { name: "Release artifacts and reset" }).click();
-    await expect(page.locator(".file-summary")).toContainText("No file selected");
+    await page.getByRole("button", { name: "Clear prepared audio" }).click();
+    await expect(page.locator(".file-summary")).toHaveCount(0);
     await page.getByRole("button", { name: "Setup", exact: true }).click();
     await expect(page.getByRole("button", { name: "Prepare native artifacts" })).toBeDisabled();
     expect(await page.evaluate(() =>

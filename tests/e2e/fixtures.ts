@@ -257,25 +257,33 @@ export async function configure(
 export async function prepare(page: Page): Promise<number> {
   const started = Date.now();
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-  await expect(page.locator(".results")).toBeVisible({ timeout: 150_000 });
+  await expect(page.locator(".evidence-audio")).toBeVisible({ timeout: 150_000 });
+  await page.locator(".evidence-audio > details").filter({ has: page.getByText("Files and diagnostics", { exact: true }) }).evaluate(element => {
+    (element as HTMLDetailsElement).open = true;
+  });
   return Date.now() - started;
 }
 
 export async function downloadJson(page: Page): Promise<DiagnosticExport> {
+  await page.getByRole("button", { name: "Download results", exact: true }).evaluate(element => {
+    const disclosure = element.closest("details");
+    if (disclosure) disclosure.open = true;
+  });
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    page.getByRole("button", { name: "Download JSON diagnostics" }).click(),
+    page.getByRole("button", { name: "Download results", exact: true }).click(),
   ]);
   expect(download.suggestedFilename()).toMatch(/\.json$/);
   const file = await download.path();
   if (!file) throw new Error("test: JSON download had no local path");
-  return JSON.parse(await readFile(file, "utf8")) as DiagnosticExport;
+  const payload = JSON.parse(await readFile(file, "utf8"));
+  return (payload.diagnostics ?? payload) as DiagnosticExport;
 }
 
 export async function downloadWav(page: Page, side: "a" | "b"): Promise<Uint8Array> {
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    page.getByRole("button", { name: `Download delivered WAV ${side === "a" ? "A" : "B"}` })
+    page.getByRole("button", { name: `Download WAV ${side === "a" ? "A" : "B"}` })
       .click(),
   ]);
   const file = await download.path();

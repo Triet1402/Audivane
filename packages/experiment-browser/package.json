@@ -1,6 +1,6 @@
 {
   "name": "@codec-abx/experiment-browser",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -9,7 +9,7 @@
     "./protocol": "./src/protocol.ts"
   },
   "dependencies": {
-    "@codec-abx/contracts": "0.1.0",
-    "@codec-abx/experiment": "0.1.0"
+    "@codec-abx/contracts": "0.2.0",
+    "@codec-abx/experiment": "0.2.0"
   }
 }

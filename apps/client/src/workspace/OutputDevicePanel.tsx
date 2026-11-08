@@ -119,11 +119,6 @@ export function OutputDevicePanel(props: {
             </>
           ) : null}
         </dl>
-        <p className="field-note">
-          A successful selection pauses playback and never resumes it. The browser-reported
-          route is not proof of physical channels or human audibility. Device ids and labels
-          stay local and are never exported.
-        </p>
       </details>
     </section>
   );

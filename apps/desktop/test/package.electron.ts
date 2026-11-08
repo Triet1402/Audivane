@@ -1,3 +1,5 @@
+import { clickRunAction } from "../../../tests/ui/run-actions.js";
+import { downloadDiagnostics } from "./diagnostic-download.js";
 import { test, expect, _electron as electron, type ElectronApplication } from "@playwright/test";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
@@ -186,7 +188,7 @@ test("packaged Audivane completes FLAC listening and exports from a foreign CWD/
     await expect(page.getByRole("heading", { name: "Audivane", exact: true })).toBeVisible();
     expect(await page.title()).toContain("Audivane");
     await expect(page.locator('section[aria-labelledby="capabilities-heading"]')).toContainText("available");
-    await expect(page.locator('section[aria-labelledby="capabilities-heading"]')).toContainText("engine-native-typescript");
+    await expect(page.locator('section[aria-labelledby="capabilities-heading"]')).toContainText("On this computer");
     await page.getByRole("button", { name: "Choose local audio…" }).click();
     await expect(page.locator(".file-summary")).toContainText("package fixture.flac");
     await page.locator(".advanced-preparation").evaluate((element) => {
@@ -196,23 +198,19 @@ test("packaged Audivane completes FLAC listening and exports from a foreign CWD/
     await page.locator("#canary-enabled").check();
     await page.getByRole("button", { name: "Prepare native artifacts" }).click();
     await expect(page.getByText("Native artifacts ready.")).toBeVisible({ timeout: 120_000 });
-    const artifact = JSON.parse(await page.locator("details", { hasText: "Raw diagnostic artifact JSON" })
-      .locator("pre").textContent() ?? "{}");
+    const exportedDiagnostic = await downloadDiagnostics(page, downloads);
+    const artifact = exportedDiagnostic.artifact;
     expect(artifact.engine.engineId).toBe("engine-native-typescript");
     expect(artifact.engine.location).toBe("desktop-native");
     expect(artifact.engine.preparationPolicy).toBe("aligned-gain-matched-v1");
     expect(artifact.measurements.policy).toBe("aligned-gain-matched-v1");
-    expect(artifact.preparation.policy).toBe("aligned-gain-matched-v1");
+    expect(artifact.preparation?.policy).toBe("aligned-gain-matched-v1");
     expect(artifact.sourceSha256).toBe(createHash("sha256").update(await fs.readFile(source)).digest("hex"));
     expect(artifact.a.delivered).toMatchObject({ sampleRate: 48000, channels: 2 });
     expect(artifact.b.encodedSampleRate).toBe(48000);
     const originalSource = "Original source: FLAC, 96000 Hz, 2 channels. Session: 48000 Hz, 2 channels (force_48k).";
     expect(artifact.disclosures).toContain(originalSource);
-    await page.locator("summary").filter({ hasText: /^Disclosures$/ }).click();
-    await expect(page.getByText(originalSource, { exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Source", exact: true })).toBeVisible();
-    expect(artifact.canary.audio).not.toBeNull();
-    await page.getByRole("button", { name: "Download JSON diagnostics" }).click();
+    expect(artifact.canary?.audio).not.toBeNull();
     const diagnosticFiles = async () => (await fs.readdir(downloads)).filter(name => name.includes("codec-abx-diagnostic"));
     await expect.poll(async () => (await diagnosticFiles()).length).toBe(1);
     const diagnostic = JSON.parse(await fs.readFile(path.join(downloads, (await diagnosticFiles())[0]!), "utf8"));
@@ -295,7 +293,7 @@ test("packaged Audivane completes FLAC listening and exports from a foreign CWD/
       }
     };
     const savedExport = async (number: number) => {
-      await page.getByRole("button", { name: "Download listening export" }).click();
+      await clickRunAction(page, "Download results");
       await expect.poll(async () => (await fs.readdir(downloads)).filter(name => name.includes("codec-abx-listening")).length)
         .toBe(number);
       const files = (await fs.readdir(downloads)).filter(name => name.includes("codec-abx-listening")).sort();
@@ -307,14 +305,14 @@ test("packaged Audivane completes FLAC listening and exports from a foreign CWD/
     await answerCurrent();
     const firstScored = await tokenAfter(calibrationToken);
     await expect(trial).toHaveAttribute("data-kind", "scored");
-    await expect(page.getByText("Choose A, B or X", { exact: true })).toBeVisible();
+    await expect(page.locator(".stage-status")).not.toContainText("Choose A, B or X");
     await expectNoLabelSelected();
     await expect(page.getByRole("button", { name: "Answer A", exact: true })).toBeDisabled();
     await selectAndPlay("A");
     await answerCurrent();
     const secondScored = await tokenAfter(firstScored);
     await expect(trial).toHaveAttribute("data-kind", "scored");
-    await expect(page.getByText("Previous trial audio", { exact: true })).toBeVisible();
+    await expect(page.locator(".stage-status")).not.toContainText("Previous trial audio");
     await expectNoLabelSelected();
     await expect(page.getByRole("button", { name: "Answer A", exact: true })).toBeDisabled();
     const active = await savedExport(1);
@@ -327,17 +325,17 @@ test("packaged Audivane completes FLAC listening and exports from a foreign CWD/
     expect(active.prepared.disclosures).toContain(originalSource);
     await selectAndPlay("A");
     await answerCurrent();
-    await expect(page.getByText("Terminal lifecycle: completed")).toBeVisible();
+    await expect(page.locator('.run-results[data-lifecycle="completed"]')).toBeVisible();
     const terminal = await savedExport(2);
     expect(terminal.experiment.reveal.redacted).toBe(false);
     expect(terminal.experiment.reveal.secretHex).toMatch(/^[a-f0-9]{64}$/);
     expect(terminal.experiment.snapshot.statistics.scoredTrials).toBe(2);
     expect(terminal.experiment.trials).toHaveLength(3);
     expect(terminal.experiment.trials.every((row: { correct: boolean }) => row.correct)).toBe(true);
-    await page.getByRole("button", { name: "Close listening run" }).click();
+    await clickRunAction(page, "Close listening run");
     await page.getByRole("button", { name: "Evidence", exact: true }).click();
-    await page.getByRole("button", { name: "Release artifacts and reset" }).click();
-    await expect(page.locator(".file-summary")).toContainText("No file selected");
+    await page.getByRole("button", { name: "Clear prepared audio" }).click();
+    await expect(page.locator(".file-summary")).toHaveCount(0);
 
     // Audit every Node-visible child spawn: only the explicitly allowed native
     // executables may appear.

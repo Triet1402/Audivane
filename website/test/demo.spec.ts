@@ -21,11 +21,23 @@ test("the served demo uses the production CSP and loads same-origin workers and 
   await page.addInitScript(installWebsiteProbe);
   const errors = collectPageErrors(page);
   const origin = new URL(baseURL!).origin;
+  await page.setViewportSize({ width: 2000, height: 1111 });
+  await page.emulateMedia({ colorScheme: "dark" });
   const response = await page.goto(`${origin}/demo/`, { waitUntil: "load" });
   expect(response, "demo response").not.toBeNull();
   expect(response!.status()).toBe(200);
   expectDemoCsp(response!.headers()["content-security-policy"]);
   expect(response!.headers()["x-robots-tag"]).toBe("noindex");
+
+  // The panels must fill the available height even when Setup is short.
+  const footerBox = await page.locator(".app-footer").boundingBox();
+  const mainBox = await page.locator(".main").boundingBox();
+  const sidebarBox = await page.locator(".sidebar").boundingBox();
+  expect(Math.abs(mainBox!.y + mainBox!.height - (footerBox!.y + footerBox!.height))).toBeLessThan(2);
+  expect(Math.abs(sidebarBox!.y + sidebarBox!.height - (footerBox!.y + footerBox!.height))).toBeLessThan(2);
+  expect(footerBox!.x).toBe(mainBox!.x);
+  expect(footerBox!.width).toBe(mainBox!.width);
+  await page.screenshot({ path: "/tmp/audivane-setup-height.png" });
 
   // The real app must start and load its codec core from this same origin.
   await expect(page.locator("#capabilities-heading")).toBeVisible();
@@ -100,6 +112,11 @@ test("the demo imports a generated analytical WAV, prepares, stages paused, answ
   await expect(page.getByRole("button", { name: "Play", exact: true })).toBeEnabled();
   await expect(page.getByRole("button", { name: "Answer A", exact: true })).toBeEnabled();
 
+  await expect(page.getByRole("heading", { name: "Trial 1 of 1", exact: true })).toBeVisible();
+  await expect(page.locator(".stage-status")).not.toContainText(/Selected [ABX]/);
+  await expect(page.locator("#listen-view")).not.toContainText("Scored trial");
+  await page.screenshot({ path: "/tmp/audivane-listen-clean.png" });
+
   // Exercise all three display labels and real paused playback before answering.
   for (const label of ["A", "B", "X"] as const) {
     const button = page.getByRole("button", { name: `Monitor playback label ${label}` });
@@ -111,17 +128,43 @@ test("the demo imports a generated analytical WAV, prepares, stages paused, answ
   await expect(page.getByRole("button", { name: "Pause", exact: true })).toBeEnabled();
   await page.getByRole("button", { name: "Pause", exact: true }).click();
   await page.getByRole("button", { name: "Answer A", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Run · completed", exact: true }))
+  await expect(page.getByRole("heading", { name: "Test complete", exact: true }))
     .toBeVisible({ timeout: 60_000 });
+  await expect(page.locator(".answer-status")).toHaveText(/^(Correct|Incorrect)$/);
+  await expect(page.getByRole("button", { name: "Reset listening run" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Close listening run" })).toHaveCount(0);
 
   // Evidence view and the listening export are the durable run artifacts.
   await page.getByRole("button", { name: "Evidence", exact: true }).click();
   await expect(page.locator("#evidence-view")).toBeVisible();
-  await expect(page.locator(".listening-stats")).toContainText("1 / 1 scored");
-  await expect(page.locator(".validity")).toContainText("delivered-validity-v2");
+  await expect(page.locator(".evidence-metrics")).toContainText("Correct");
+  await expect(page.locator(".evidence-metrics")).toContainText("/ 1");
+  await expect(page.locator(".evidence-metrics")).toContainText("p-value");
+  await expect(page.locator("#evidence-view pre")).toHaveCount(0);
+
+  // Evidence disclosures retain both open and closed states across navigation.
+  for (const open of [true, false]) {
+    for (const name of ["Test details", "Audio measurements", "Files and diagnostics"]) {
+      await page.getByText(name, { exact: true }).evaluate((summary, expanded) => {
+        (summary.closest("details") as HTMLDetailsElement).open = expanded;
+      }, open);
+    }
+    await page.getByRole("button", { name: "Listen", exact: true }).click();
+    await page.getByRole("button", { name: "Evidence", exact: true }).click();
+    for (const name of ["Test details", "Audio measurements", "Files and diagnostics"]) {
+      expect(await page.getByText(name, { exact: true }).evaluate(summary => summary.closest("details")!.open)).toBe(open);
+    }
+  }
+  await expect(page.getByRole("button", { name: "Preview A", exact: true })).toBeEnabled();
+  await page.getByRole("button", { name: "Preview A", exact: true }).click();
+  await expect(page.locator('audio[aria-label="Preview A"]')).toHaveAttribute("src", /^blob:/);
+  const wavDownload = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download WAV A", exact: true }).click();
+  expect((await wavDownload).suggestedFilename()).toMatch(/side-a.*\.wav$/);
 
   const exported = await downloadListeningExport(page) as {
     schema: string;
+    diagnostics: { artifact: { sourceSha256: string } };
     listening: {
       lifecycle: string;
       calibrationExcludedFromScoredN: boolean;
@@ -155,6 +198,7 @@ test("the demo imports a generated analytical WAV, prepares, stages paused, answ
   };
 
   expect(exported.schema).toBe("codec-abx-browser-listening-v1");
+  expect(exported.diagnostics.artifact.sourceSha256).toBe(fixtureHash);
   expect(exported.prepared.sourceSha256).toBe(fixtureHash);
   expect(exported.prepared.request.canaryEnabled ?? false).toBe(false);
   expect(exported.prepared.request).toMatchObject({
@@ -212,4 +256,57 @@ test("the demo imports a generated analytical WAV, prepares, stages paused, answ
   }
   expectNoRemoteOrUpload(guard);
   expect(errors, "uncaught page error").toEqual([]);
+});
+
+test("listening feedback keeps playback fixed and the footer stays visible on desktop and mobile", async ({ page, baseURL }) => {
+  await openDemo(page, baseURL!);
+  await chooseWav(page, "layout.wav", makePcm16Wav({ sampleRate: 48000, channels: 1, seconds: 0.6, amplitude: 0.2 }));
+  await configure(page, { a: "noop_passthrough", b: "opus", bitrateB: 64, mode: "native", policy: "aligned-gain-matched-v1", canary: false });
+  await page.getByLabel("Planned scored trials N (1–1000)").fill("2");
+  for (const width of [1440, 320]) {
+    await page.setViewportSize({ width, height: 800 });
+    const footer = await page.locator(".app-footer").boundingBox();
+    expect(footer!.y + footer!.height).toBeLessThanOrEqual(801);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.getByRole("button", { name: "Prepare test", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Answer A", exact: true })).toBeEnabled({ timeout: 180000 });
+  const before = await page.locator(".listening-transport").boundingBox();
+  await page.getByRole("button", { name: "Answer A", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Trial 2 of 2", exact: true })).toBeVisible();
+  await expect(page.locator(".answer-status")).toHaveText(/^(Correct|Incorrect)$/);
+  const after = await page.locator(".listening-transport").boundingBox();
+  expect(after!.y).toBe(before!.y);
+  await expect(page.locator("#listen-view")).not.toContainText(/Previous trial audio|Choose A, B or X/);
+  await page.screenshot({ path: "/tmp/audivane-feedback-desktop.png" });
+  await page.setViewportSize({ width: 320, height: 740 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+  await page.screenshot({ path: "/tmp/audivane-feedback-mobile.png" });
+});
+
+
+test("expanded footer details use page scrolling at desktop and mobile widths", async ({ page, baseURL }) => {
+  await openDemo(page, baseURL!);
+  for (const width of [1440, 320]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.locator(".cap-details > summary").click();
+    const layout = await page.locator(".app-footer").evaluate((footer) => ({
+      height: footer.getBoundingClientRect().height,
+      clientHeight: footer.clientHeight,
+      scrollHeight: footer.scrollHeight,
+      pageHeight: document.documentElement.scrollHeight,
+    }));
+    expect(layout.height).toBeGreaterThan(200);
+    expect(layout.scrollHeight).toBeLessThanOrEqual(layout.clientHeight + 1);
+    expect(layout.pageHeight).toBeGreaterThan(800);
+    await page.mouse.move(width / 2, 200);
+    await page.mouse.wheel(0, 600);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+    await page.screenshot({ path: `/tmp/audivane-expanded-footer-${width}.png` });
+    await page.locator(".cap-details > summary").click();
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const collapsed = await page.locator(".app-footer").boundingBox();
+    expect(collapsed!.y + collapsed!.height).toBeLessThanOrEqual(801);
+  }
 });

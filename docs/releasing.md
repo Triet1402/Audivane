@@ -1,37 +1,24 @@
 # Audivane release preparation
 
-Status: **0.1.0 publication preparation**. The owner has requested publication
-of the available packages with the testing limits recorded below. Version `0.1.0`
-is assigned consistently across workspace manifests, internal dependency ranges,
-the lockfile, application metadata and artifact filenames. There is no release
-tag, upload, pushed branch or public support claim from this work.
+Status: **0.2.0 release preparation**. Version `0.2.0` is assigned across the
+workspace manifests, internal dependencies, lockfiles and application metadata.
+The latest published release remains `0.1.0` until the new GitHub release is
+published. See [0.2.0 release notes](release-notes-0.2.0.md).
 
 ## Release route
 
-The first public source release will be a **clean snapshot with one initial
-commit**, prepared in an isolated repository. Keep development history private
-and intact. Review the [publication checklist](publication-review.md) before
-building final downloads.
+Continue the existing public repository at
+[Triet1402/Audivane](https://github.com/Triet1402/Audivane). The initial clean
+snapshot was published as `0.1.0`; a second initial repository is not needed.
+Prepare the reviewed source commit, matching binaries and source attachments,
+then stage a GitHub draft release. Keep public download links on the latest
+published release until the draft is published. Never relabel 0.1.0 packages as
+0.2.0 or transfer their acceptance claims to the new binaries.
 
-| Gate | Current evidence | Remaining work |
-| --- | --- | --- |
-| Shared application | Integrated automated acceptance recorded | Check changes and build the final snapshot |
-| Linux `.deb` / Arch | Bounded KVM install, sandbox and lifecycle checks | Full final installed UI, normal desktop and physical listening; Arch cross-version upgrade |
-| Windows | Unsigned 0.1.0 NSIS/ZIP tested on Windows 11 x64: install, FLAC listening/export, repair/removal and process lifetime | Full installed codec matrix, interactive/cross-version upgrade checks and physical listening |
-| AppImage | Staging/tooling | Produce and test only if shipping |
-| Public web | Verified browser source/build materials; real app compiled under `/demo/` | Final deployed-origin acceptance; see [browser evidence](../website/BROWSER-MATERIALS.md) |
-| Publication | Local preparation tooling | Final content audit, identity, signing decision and matching attachments |
-
-The [Windows 0.1.0 acceptance record](windows-acceptance-0.1.0.md) identifies the
-exact tested downloads and the limits of those checks. The website is deployed
-as a browser preview; it is not a tagged desktop release.
-
-Recorded results apply to their exact revision and artifact hashes. New packages
-need their own verification against the [installed acceptance matrix](distribution-acceptance.md).
-
-For the recommended formats, publication sequence and web hosting choices, see
-[distribution strategy](distribution-strategy.md). These are recommendations;
-Flatpak, Snap and macOS packaging are not implemented.
+For 0.2.0, keep checks focused on version consistency, TypeScript compilation,
+building, and structural/checksum verification. No broad automated UI suite is
+part of this preparation. Installed-platform and physical listening coverage
+remain separate, as recorded in the [release notes](release-notes-0.2.0.md).
 
 ## Build inputs and local commands
 
@@ -151,5 +138,4 @@ GitHub Releases is the intended first binary/source channel, without a
 fabricated public URL. Flathub is the preferred later Linux catalog and WinGet
 the preferred Windows listing after installer acceptance. npm publication is
 not needed for desktop users. No stores, releases or repository settings are
-changed by these build commands. The [release notes](release-notes-0.1.0.md)
-remain a local draft.
+changed by these build commands. The [0.2.0 release notes](release-notes-0.2.0.md) describe the current candidate.

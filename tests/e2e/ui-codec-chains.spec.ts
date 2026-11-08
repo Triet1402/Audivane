@@ -1,3 +1,4 @@
+import { clickRunAction } from "../ui/run-actions.js";
 import { readFile } from "node:fs/promises";
 
 import { expect, test, type Page } from "@playwright/test";
@@ -86,7 +87,7 @@ test("mixed two-stage browser chain exposes all stage facts, exports them and lo
   // Side B stays the default one-stage Opus 128 request.
 
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-  await expect(page.locator(".results")).toBeVisible({ timeout: 150_000 });
+  await expect(page.locator(".evidence-audio")).toBeVisible({ timeout: 150_000 });
 
   const diagnostic = await downloadJson(page) as unknown as {
     artifact: PreparedArtifact;
@@ -127,7 +128,7 @@ test("mixed two-stage browser chain exposes all stage facts, exports them and lo
   await page.getByRole("button", { name: "Listen", exact: true }).click();
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    page.getByRole("button", { name: "Download listening export" }).click(),
+    clickRunAction(page, "Download results"),
   ]);
   const file = await download.path();
   if (!file) throw new Error("test: listening export had no local path");
@@ -181,7 +182,7 @@ test("four-stage reorder is preserved and a differing ordered prefix is not appl
   const expectedA = ["aac", "mp3", "opus", "ogg_vorbis"];
 
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-  await expect(page.locator(".results")).toBeVisible({ timeout: 150_000 });
+  await expect(page.locator(".evidence-audio")).toBeVisible({ timeout: 150_000 });
   const reordered = (await downloadJson(page)).artifact;
   expect(reordered.request.version).toBe(2);
   const reorderedRequest = reordered.request as PreparationRequest;
@@ -222,7 +223,7 @@ test("96 kHz mono and stereo MP3 inputs keep honest stage rates and bitrates", a
       seconds: 0.5,
     }));
     await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-    await expect(page.locator(".results")).toBeVisible({ timeout: 150_000 });
+    await expect(page.locator(".evidence-audio")).toBeVisible({ timeout: 150_000 });
     const artifact = (await downloadJson(page)).artifact;
     expect(artifact.a.delivered.channels).toBe(channels);
     expect(artifact.b.delivered.channels).toBe(channels);
@@ -257,11 +258,11 @@ test("an intermediate-stage abort cancels cleanly and an explicit retry succeeds
     await expect(page.locator(".run-status")).toContainText(/stage 2/i, { timeout: 150_000 });
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
     await expect(page.locator(".run-status")).toContainText("Cancelled.", { timeout: 150_000 });
-    await expect(page.locator(".results")).toHaveCount(0);
+    await expect(page.locator(".evidence-audio")).toHaveCount(0);
 
     // Retry is an explicit new run; no stale artifact is published.
     await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-    await expect(page.locator(".results")).toBeVisible({ timeout: 180_000 });
+    await expect(page.locator(".evidence-audio")).toBeVisible({ timeout: 180_000 });
     const artifact = (await downloadJson(page)).artifact;
     expect(artifact.request.version).toBe(2);
     expect(artifact.a.stages).toHaveLength(2);

@@ -145,7 +145,6 @@ test("prepared null gate passes identical pipelines, is not-applicable for diffe
   expect(raw.scientificStatus.canaryMaterialChecked).toBe(false);
   expect(raw.scientificStatus.canaryMaterialGenerated).toBe(false);
   expect(raw.scientificStatus.canaryAudioRetained).toBe(false);
-  await expect(page.locator(".validity")).toHaveCount(0);
   await expect(page.locator(".canary")).toHaveCount(0);
 
   await configure(page, {
@@ -178,12 +177,6 @@ test("prepared null gate passes identical pipelines, is not-applicable for diffe
   expect(identical.scientificStatus.canaryGates).toBe(false);
   expect(identical.scientificStatus.canaryMaterialChecked).toBe(false);
   expect(identical.artifact.canary).toBeUndefined();
-  await expect(page.locator(".validity")).toContainText("delivered-validity-v2");
-  await expect(page.locator(".validity")).toContainText("Preparation validity");
-  await expect(page.locator(".validity")).toContainText("same-polarity-periodic-ambiguous");
-  await expect(page.locator(".validity")).toContainText("no unique lag");
-  await expect(page.locator(".validity")).toContainText("passed");
-  await expect(page.locator(".validity")).toContainText("exact digital null");
   await expect(page.locator(".canary")).toHaveCount(0);
 
   await configure(page, {
@@ -197,8 +190,6 @@ test("prepared null gate passes identical pipelines, is not-applicable for diffe
     status: "not-applicable",
   });
   expect(different.scientificStatus.nullGateStatus).toBe("not-applicable");
-  await expect(page.locator(".validity")).toContainText("not-applicable");
-  await expect(page.locator(".validity")).toContainText("not expected");
   expect(JSON.stringify(different)).not.toContain("Infinity");
   expect(JSON.stringify(different)).not.toContain("NaN");
 
@@ -440,7 +431,7 @@ test("cancel and reset during the real canary stage terminate the worker and per
   });
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
   await expect(page.locator(".run-status")).toContainText("Cancelled.", { timeout: 150_000 });
-  await expect(page.locator(".results")).toHaveCount(0);
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
 
   const afterCancel = await page.evaluate(() => (
     window as unknown as {
@@ -455,9 +446,9 @@ test("cancel and reset during the real canary stage terminate the worker and per
     (window as unknown as { __canaryAction?: string | null }).__canaryAction = "reset";
   });
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-  await expect(page.locator(".run-status")).toContainText("Idle.", { timeout: 150_000 });
-  await expect(page.locator(".results")).toHaveCount(0);
-  await expect(page.locator(".file-summary")).toContainText("No file selected");
+  await expect(page.locator(".run-status")).toBeEmpty({ timeout: 150_000 });
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
+  await expect(page.locator(".file-summary")).toHaveCount(0);
   await expect(page.locator("#source-file")).toHaveValue("");
   await expect(page.locator("#canary-enabled")).toBeChecked();
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
@@ -565,7 +556,7 @@ test("tampered null/canary decisions and canary WAV layouts reject without publi
     await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
     await expect(page.getByRole("alert").first())
       .toContainText(/Preparation worker returned|Preparation worker omitted|Canary report|WAV/i);
-    await expect(page.locator(".results")).toHaveCount(0);
+    await expect(page.locator(".evidence-audio")).toHaveCount(0);
     expect(await page.evaluate(() => {
       const state = (window as unknown as {
         __canaryCorruption: { created: number; terminated: number };

@@ -1,3 +1,4 @@
+import { clickRunAction } from "../ui/run-actions.js";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -160,8 +161,7 @@ test("listening UI refreshes real output support, locks changes after staging, a
   await expect(page.getByText("Locked for this test.")).toBeVisible();
   await expect(page.getByLabel("Select a listed output")).toBeDisabled();
 
-  await page.getByRole("button", { name: "Reset listening run" }).click();
-  await expect(page.getByText(/Run reset:/)).toBeVisible({ timeout: 120_000 });
+  await clickRunAction(page, "Close listening run");
   await expect(page.getByLabel("Select a listed output")).toBeVisible();
   await expect(page.getByText("Locked for this test.")).toHaveCount(0);
   await expect(page.getByLabel("Select a listed output")).toBeEnabled();

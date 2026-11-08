@@ -1,3 +1,4 @@
+import { clickRunAction } from "../../tests/ui/run-actions.js";
 import { readFile } from "node:fs/promises";
 
 import { expect, type Page } from "@playwright/test";
@@ -105,7 +106,7 @@ export async function openDemo(page: Page, baseURL: string): Promise<NetworkGuar
 export async function downloadListeningExport(page: Page): Promise<Record<string, unknown>> {
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    page.getByRole("button", { name: "Download listening export" }).click(),
+    clickRunAction(page, "Download results"),
   ]);
   expect(download.suggestedFilename()).toMatch(/^codec-abx-listening-.*\.json$/);
   const file = await download.path();

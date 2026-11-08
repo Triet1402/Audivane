@@ -1,15 +1,15 @@
 {
   "name": "@codec-abx/client",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@codec-abx/contracts": "0.1.0",
-    "@codec-abx/engine-browser": "0.1.0",
-    "@codec-abx/experiment-browser": "0.1.0",
-    "@codec-abx/playback": "0.1.0",
-    "@codec-abx/preparation": "0.1.0",
+    "@codec-abx/contracts": "0.2.0",
+    "@codec-abx/engine-browser": "0.2.0",
+    "@codec-abx/experiment-browser": "0.2.0",
+    "@codec-abx/playback": "0.2.0",
+    "@codec-abx/preparation": "0.2.0",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   }

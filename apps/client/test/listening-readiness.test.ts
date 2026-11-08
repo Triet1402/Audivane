@@ -35,10 +35,7 @@ import {
 } from "../src/listening/ListeningSection.js";
 import { trialStartGateBlocker } from "../src/listening/readiness.js";
 
-/**
- * The rendered form starts from these defaults, so a matching plan keeps the
- * Start control's dirty-plan guard out of the readiness assertions.
- */
+/** Shared plan for the rendered gate-recovery scenarios. */
 const PLAN: ExperimentPlan = Object.freeze({
   version: 1,
   plannedTrials: 8,
@@ -272,18 +269,14 @@ async function harness(kind: "passed" | "failed-preparation" | "failed-null"): P
   return { controller, player, client, readers, artifact: built.artifact };
 }
 
-function startButton(state: Harness["controller"]["state"], harnessed: Harness): {
+function configuredView(state: Harness["controller"]["state"], harnessed: Harness): {
   readonly html: string;
-  readonly disabled: boolean;
 } {
   const primary: ListeningPrimary = {
     phase: "idle",
     busy: false,
     message: null,
-    progressMessage: null,
-    error: null,
     canPrepare: true,
-    blockedReason: null,
     pairReady: true,
     onPrepare: async () => {},
     onCancel: async () => {},
@@ -291,15 +284,14 @@ function startButton(state: Harness["controller"]["state"], harnessed: Harness):
   const html = renderToStaticMarkup(createElement(ListeningSection, {
     artifact: harnessed.artifact,
     listening: { controller: harnessed.controller, state },
-    readers: harnessed.readers,
     runtimeKind: "browser",
-    calibrationEnabled: state.snapshot?.plan.calibrationEnabled ?? false,
-    onCalibrationChange: () => {},
+    onEnd: () => {},
+    onReset: () => {},
+    onDisableCalibration: () => {},
     primary,
   }));
-  const match = html.match(/<button[^>]*>Start trial 1 \(paused\)<\/button>/);
-  assert.ok(match, "the configured run must render the Start trial 1 control");
-  return { html, disabled: match[0].includes("disabled=\"\"") };
+  assert.doesNotMatch(html, /Start trial 1 \(paused\)|No trial is staged|View results/);
+  return { html };
 }
 
 async function refuseAfterRecovery(harnessed: Harness, recovery: "reset" | "retry" | "plan-change"): Promise<void> {
@@ -356,26 +348,24 @@ test("synthetic content carries failed gates computed by the real evaluators", (
   assert.equal(passed.nullGate.status, "not-applicable");
 });
 
-test("reset retains a failed preparation gate and the rendered Start control stays disabled", async () => {
+test("reset retains and displays a failed preparation gate", async () => {
   const harnessed = await harness("failed-preparation");
   await refuseAfterRecovery(harnessed, "reset");
 
   assert.equal(harnessed.controller.state.snapshot?.gates.preparationStatus, "failed");
-  const start = startButton(harnessed.controller.state, harnessed);
-  assert.equal(start.disabled, true, "a failed preparation gate must disable Start after Reset");
+  const start = configuredView(harnessed.controller.state, harnessed);
   assert.match(start.html, /Preparation validity/);
   assert.match(start.html, /The bound pair failed the frozen preparation-validity gate/);
   assert.doesNotMatch(start.html, /Start trial 1 paused when you are ready/);
   assert.match(start.html, /failed the frozen preparation-validity gate/);
 });
 
-test("retrying the configured binding does not re-enable Start over a failed preparation gate", async () => {
+test("retrying the configured binding keeps the failed preparation gate visible", async () => {
   const harnessed = await harness("failed-preparation");
   await refuseAfterRecovery(harnessed, "retry");
 
   assert.equal(harnessed.controller.state.snapshot?.gates.preparationStatus, "failed");
-  const start = startButton(harnessed.controller.state, harnessed);
-  assert.equal(start.disabled, true);
+  const start = configuredView(harnessed.controller.state, harnessed);
   assert.match(start.html, /The bound pair failed the frozen preparation-validity gate/);
 });
 
@@ -384,9 +374,7 @@ test("a plan re-check retains the failed preparation gate and renders its blocke
   await refuseAfterRecovery(harnessed, "plan-change");
 
   assert.equal(harnessed.controller.state.snapshot?.gates.preparationStatus, "failed");
-  // The static render keeps the form's default N=8, so its dirty-plan guard
-  // would mask this case. Assert the controller-known gate fact directly; it is
-  // the same predicate the rendered control now uses.
+  // The same gate decision governs staging and the visible recovery message.
   assert.equal(
     trialStartGateBlocker(
       harnessed.controller.state.snapshot!,
@@ -395,19 +383,18 @@ test("a plan re-check retains the failed preparation gate and renders its blocke
     "preparation-gate-failed",
   );
   assert.match(
-    startButton(harnessed.controller.state, harnessed).html,
+    configuredView(harnessed.controller.state, harnessed).html,
     /The bound pair failed the frozen preparation-validity gate/,
   );
 });
 
-test("reset retains a failed null gate and the rendered Start control stays disabled", async () => {
+test("reset retains and displays a failed null gate", async () => {
   const harnessed = await harness("failed-null");
   await refuseAfterRecovery(harnessed, "reset");
 
   assert.equal(harnessed.controller.state.snapshot?.gates.preparationStatus, "passed");
   assert.equal(harnessed.controller.state.snapshot?.gates.nullStatus, "failed");
-  const start = startButton(harnessed.controller.state, harnessed);
-  assert.equal(start.disabled, true);
+  const start = configuredView(harnessed.controller.state, harnessed);
   assert.match(start.html, /failed the identical-pipeline null gate/);
 });
 
@@ -429,7 +416,7 @@ test("the controller still refuses the shared gate itself when Start is invoked 
 
 test("a passed preparation gate and applicable null outcome still stage trial 1", async () => {
   const harnessed = await harness("passed");
-  assert.equal(startButton(harnessed.controller.state, harnessed).disabled, false);
+  assert.doesNotMatch(configuredView(harnessed.controller.state, harnessed).html, /Start trial 1/);
   await harnessed.controller.start();
   assert.equal(harnessed.client.nextTrialCalls, 1);
   assert.equal(harnessed.controller.state.error, null);
@@ -503,4 +490,20 @@ test("the shared decision covers real bound states and the defensive unmeasured 
     )?.code,
     "preparation-gate-not-measured",
   );
+});
+
+test("UI restart clears the previous run and stages trial 1 paused without an extra Start step", async () => {
+  const harnessed = await harness("passed");
+  await harnessed.controller.start();
+  const previousRun = harnessed.controller.state.snapshot!.runId;
+  await harnessed.controller.restart();
+  assert.notEqual(harnessed.controller.state.snapshot!.runId, previousRun);
+  assert.equal(harnessed.controller.state.session, "running");
+  assert.equal(harnessed.controller.state.trial!.trialIndex, 1);
+  assert.equal(harnessed.controller.state.playback!.playing, false);
+  assert.equal(harnessed.controller.state.feedback, null);
+  const exported = await harnessed.controller.exportPayload();
+  assert.equal((exported!.diagnostics.artifact as { readonly id: string }).id, harnessed.artifact.id);
+  assert.equal(exported!.experiment.snapshot.runId, harnessed.controller.state.snapshot!.runId);
+  assert.equal(exported!.experiment.reveal.redacted, true);
 });

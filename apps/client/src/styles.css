@@ -68,7 +68,7 @@
   --unknown-ink: #555d6d;
   --radius: 10px;
   --topbar-height: 3.75rem;
-  --sidebar-width: 280px;
+  --sidebar-width: 300px;
 }
 
 :root[data-theme="dark"] {
@@ -179,13 +179,14 @@ a {
 /* Shell */
 
 .app {
-  min-height: 100dvh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--bg);
 }
 
 .topbar {
+  flex-shrink: 0;
   position: sticky;
   top: 0;
   z-index: 30;
@@ -301,22 +302,26 @@ a {
 
 .workspace {
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
-  align-items: start;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
   min-width: 0;
 }
 
 .sidebar {
   position: sticky;
-  top: var(--topbar-height);
-  align-self: start;
-  max-height: calc(100dvh - var(--topbar-height));
+  top: 0;
+  align-self: stretch;
+  min-height: 0;
+  max-height: 100%;
   overflow-y: auto;
-  padding: 1.25rem 1.1rem 2rem;
+  padding: 1.35rem 1.2rem 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1.45rem;
+  gap: 1.65rem;
   min-width: 0;
   background: var(--bg);
   border-right: 1px solid var(--line);
@@ -328,12 +333,22 @@ a {
 }
 
 .main {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
-  min-height: calc(100dvh - var(--topbar-height));
+  min-height: 0;
+  overflow: hidden;
   background: var(--surface);
 }
 
+.main-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .viewbar {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -424,7 +439,7 @@ a {
 
 .side-group {
   display: grid;
-  gap: 0.5rem;
+  gap: 0.62rem;
   min-width: 0;
 }
 
@@ -438,7 +453,7 @@ a {
 .side-title {
   margin: 0;
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.76rem;
   font-weight: 600;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -446,17 +461,16 @@ a {
 
 .side-meta {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.77rem;
   font-variant-numeric: tabular-nums;
   text-align: end;
 }
 
-.side-note,
-.output-summary {
+.side-note{
   margin: 0;
   color: var(--muted);
-  font-size: 0.73rem;
-  line-height: 1.5;
+  font-size: 0.79rem;
+  line-height: 1.55;
   overflow-wrap: anywhere;
 }
 
@@ -472,31 +486,31 @@ a {
 
 .file-picker {
   color: var(--muted);
-  font-size: 0.74rem;
+  font-size: 0.79rem;
   font-weight: 600;
 }
 
 input[type="file"] {
   width: 100%;
   min-width: 0;
-  padding: 0.38rem;
+  padding: 0.42rem;
   border: 1px solid var(--line-strong);
   border-radius: 7px;
   background: var(--surface);
   color: var(--muted);
   font: inherit;
-  font-size: 0.76rem;
+  font-size: 0.8rem;
 }
 
 input[type="file"]::file-selector-button {
   margin-inline-end: 0.5rem;
-  padding: 0.28rem 0.5rem;
+  padding: 0.3rem 0.55rem;
   border: 1px solid var(--line-strong);
   border-radius: 5px;
   background: var(--surface-2);
   color: var(--ink);
   font: inherit;
-  font-size: 0.74rem;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
 }
@@ -506,7 +520,7 @@ input[type="file"]::file-selector-button {
   min-width: 0;
   overflow-wrap: anywhere;
   color: var(--ink);
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -522,7 +536,7 @@ input[type="file"]::file-selector-button {
 .listening-test-plan > summary {
   width: max-content;
   color: var(--muted);
-  font-size: 0.73rem;
+  font-size: 0.79rem;
   font-weight: 500;
   text-underline-offset: 3px;
 }
@@ -540,13 +554,13 @@ input[type="file"]::file-selector-button {
 .device {
   width: 100%;
   min-width: 0;
-  padding: 0.38rem 0.45rem;
+  padding: 0.42rem 0.5rem;
   border: 1px solid var(--line-strong);
   border-radius: 6px;
   background: var(--surface);
   color: var(--ink);
   font: inherit;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
 }
 
 .output-actions {
@@ -554,8 +568,8 @@ input[type="file"]::file-selector-button {
 }
 
 .output-actions button {
-  padding: 0.3rem 0.5rem;
-  font-size: 0.72rem;
+  padding: 0.32rem 0.55rem;
+  font-size: 0.77rem;
   font-weight: 500;
 }
 
@@ -566,9 +580,9 @@ input[type="file"]::file-selector-button {
 .plan-lines {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.22rem 0.6rem;
+  gap: 0.3rem 0.6rem;
   margin: 0;
-  font-size: 0.76rem;
+  font-size: 0.81rem;
 }
 
 .plan-lines dt {
@@ -595,19 +609,19 @@ input[type="file"]::file-selector-button {
 
 .plan-field label {
   color: var(--muted);
-  font-size: 0.73rem;
+  font-size: 0.79rem;
   font-weight: 500;
 }
 
 .listening-test-plan input,
 .listening-test-plan select {
-  font-size: 0.78rem;
-  padding: 0.3rem 0.4rem;
+  font-size: 0.82rem;
+  padding: 0.32rem 0.42rem;
 }
 
 .listening-test-plan .field-note {
   margin-top: 0.45rem;
-  font-size: 0.71rem;
+  font-size: 0.76rem;
 }
 
 .readiness {
@@ -636,7 +650,7 @@ input[type="file"]::file-selector-button {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
 }
 
 .calibration-optin input {
@@ -652,7 +666,7 @@ input[type="file"]::file-selector-button {
   background: transparent;
   color: var(--accent-text);
   cursor: pointer;
-  font-size: 0.71rem;
+  font-size: 0.76rem;
   font-weight: 500;
   list-style: none;
   text-decoration: underline;
@@ -666,14 +680,14 @@ input[type="file"]::file-selector-button {
   border-radius: 7px;
   background: var(--surface);
   color: var(--muted);
-  font-size: 0.73rem;
-  line-height: 1.5;
+  font-size: 0.78rem;
+  line-height: 1.55;
 }
 
 .side-action {
   justify-self: start;
-  padding: 0.35rem 0.55rem;
-  font-size: 0.74rem;
+  padding: 0.38rem 0.6rem;
+  font-size: 0.79rem;
 }
 
 .side-foot {
@@ -770,8 +784,7 @@ progress {
 /* Setup */
 
 .chain-board {
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--line);
+  padding-bottom: 0;
 }
 
 .section-head {
@@ -789,10 +802,6 @@ progress {
   line-height: 1.25;
   font-weight: 600;
   letter-spacing: -0.005em;
-}
-
-.compact-head {
-  margin-bottom: 0.4rem;
 }
 
 .section-meta {
@@ -1067,9 +1076,9 @@ progress {
   z-index: 5;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 1rem;
-  margin-top: 1.2rem;
+  margin-top: 1rem;
   padding: 0.85rem 0;
   border-top: 1px solid var(--line);
   background: var(--surface);
@@ -1350,46 +1359,72 @@ details[open] > summary {
   font-size: 0.88rem;
 }
 
+.trial-heading-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 2.5rem;
+}
+
 .answer-status {
-  max-width: 64ch;
-  margin: 0.6rem 0 0;
-  color: var(--muted);
-  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+  width: fit-content;
+  margin: 0;
+  min-width: 6.5rem;
+  min-height: 2rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 4px;
+  font-size: 0.88rem;
+  font-weight: 600;
 }
 
-.answer-status strong {
-  color: var(--ink);
-}
-
-.terminal {
-  margin-top: 1.1rem;
-  padding: 0.8rem 0.9rem;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: var(--unknown-bg);
-  color: var(--unknown-ink);
-  font-size: 0.8rem;
-}
-
-.terminal h2 {
-  margin: 0 0 0.3rem;
-  font-size: 0.9rem;
-}
-
-.terminal p {
-  margin: 0.25rem 0;
-}
-
-.terminal-completed {
-  border-color: color-mix(in srgb, var(--ok-ink) 35%, var(--line));
+.answer-correct {
   background: var(--ok-bg);
   color: var(--ok-ink);
 }
 
-.terminal-void {
-  border-color: color-mix(in srgb, var(--bad-ink) 35%, var(--line));
+.answer-incorrect {
   background: var(--bad-bg);
   color: var(--bad-ink);
+}
+
+.run-results {
+  margin-top: 1.5rem;
+  font-size: 0.88rem;
+}
+
+.run-results p {
+  margin: 0;
+}
+
+.trial-tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+}
+
+.trial-tally li {
+  padding: 0.15rem 0.35rem 0.15rem 0;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.trial-tally .tally-hit {
+  color: var(--ok-ink);
+}
+
+.trial-tally .tally-miss {
+  color: var(--bad-ink);
+}
+
+.trial-tally .tally-neutral {
+  color: var(--muted);
 }
 
 .listen-context {
@@ -1416,12 +1451,6 @@ details[open] > summary {
   margin: 0;
 }
 
-.listen-actions-wide {
-  margin-top: 1.1rem;
-  padding-top: 0.85rem;
-  border-top: 1px solid var(--line);
-}
-
 .listening-actions {
   margin-top: 0.4rem;
   gap: 0.35rem;
@@ -1440,6 +1469,28 @@ details[open] > summary {
   margin-top: 0.5rem;
 }
 
+/* Evidence summary */
+.evidence-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 1.5rem 2rem;
+  margin: 0.6rem 0 1rem;
+}
+.evidence-metrics > div { min-width: 0; }
+.evidence-metrics dt { color: var(--muted); font-size: 0.85rem; }
+.evidence-metrics dd {
+  margin: 0.35rem 0 0;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+.evidence-metrics dd span { color: var(--muted); font-size: 1rem; }
+.evidence-audio { display: grid; gap: 1rem; margin-top: 1.5rem; }
+.evidence-audio > h2 { margin: 0; }
+.evidence-audio .diagnostic-audio { display: grid; gap: 0.75rem; }
+.evidence-audio audio { max-width: 100%; }
+
 /* Run record */
 
 .run-record {
@@ -1450,36 +1501,6 @@ details[open] > summary {
   border-bottom: 1px solid var(--line);
 }
 
-.run-record > .section-head {
-  margin-bottom: 0;
-}
-
-.listening-plan-facts {
-  grid-template-columns: minmax(7rem, max-content) minmax(0, 1fr);
-}
-
-.commitment {
-  font-size: 0.73rem;
-  overflow-wrap: anywhere;
-}
-
-.listening-stats {
-  padding: 0.7rem 0.8rem;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: var(--surface-2);
-}
-
-.listening-stats h3 {
-  margin: 0;
-  font-size: 0.86rem;
-  font-weight: 600;
-}
-
-.stat-line {
-  margin: 0.2rem 0;
-}
-
 .gate-reasons {
   margin: 0.45rem 0 0;
   padding-inline-start: 1.1rem;
@@ -1487,27 +1508,7 @@ details[open] > summary {
   font-size: 0.76rem;
 }
 
-.playback-facts {
-  margin-top: 0;
-}
-
 /* Results and evidence */
-
-.panel {
-  padding: 1rem 1.1rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface);
-}
-
-.results {
-  margin-top: 1.1rem;
-  background: var(--surface);
-}
-
-.results .section-head {
-  margin-bottom: 0.85rem;
-}
 
 .delivered-grid {
   display: grid;
@@ -1563,19 +1564,11 @@ details[open] > summary {
   flex-wrap: wrap;
   gap: 0.35rem;
 }
-
-.provenance,
-.preparation,
 .measurements,
-.validity,
 .canary {
   margin-top: 0.9rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--line);
-}
-
-.track-card .provenance {
-  margin-top: 0.1rem;
 }
 
 .gate-line {
@@ -1585,46 +1578,10 @@ details[open] > summary {
   justify-content: space-between;
   gap: 0.35rem 1rem;
 }
-
-.validity h3,
-.canary h3,
-.measurements h3 {
+.canary h3 {
   margin: 0;
   font-size: 0.88rem;
   font-weight: 600;
-}
-
-.gate-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.2rem 0.85rem;
-  margin: 0;
-  font-size: 0.73rem;
-}
-
-.gate-facts dt::after {
-  content: ":";
-}
-
-.gate-facts dd {
-  margin: 0;
-}
-
-.measurement-sides {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin: 0.65rem 0;
-}
-
-.measurement-sides h3 {
-  margin: 0 0 0.25rem;
-  font-size: 0.8rem;
-}
-
-.measurement-sides .track-card {
-  padding-top: 0.55rem;
-  border-top: 1px solid var(--line);
 }
 
 .diagnostic-audio {
@@ -1648,41 +1605,46 @@ audio {
   max-width: 48rem;
 }
 
-.table-scroll {
-  width: 100%;
-  margin: 0.45rem 0;
-  overflow-x: auto;
-}
-
-.stage-facts {
-  width: 100%;
-  min-width: 42rem;
-  border-collapse: collapse;
-  font-size: 0.73rem;
-}
-
-.stage-facts th,
-.stage-facts td {
-  padding: 0.28rem 0.32rem;
-  border-bottom: 1px solid var(--line);
-  text-align: start;
-  vertical-align: top;
-}
-
-.stage-facts thead th {
-  color: var(--muted);
-  font-size: 0.72rem;
-  font-weight: 600;
-}
-
 /* Runtime capabilities and footer */
 
 .app-footer {
+  flex-shrink: 0;
   border-top: 1px solid var(--line);
   background: var(--surface);
   padding: 0.85rem clamp(1rem, 2.5vw, 2.25rem) 1.2rem;
   display: grid;
   gap: 0.65rem;
+}
+
+/* Expanded footer disclosures join the document's normal scroll flow. */
+.app:has(.app-footer details[open]) {
+  height: auto;
+  min-height: 100dvh;
+}
+
+.app:has(.app-footer details[open]) .workspace {
+  flex: none;
+  min-height: calc(100dvh - var(--topbar-height));
+  overflow: visible;
+  grid-template-rows: auto;
+}
+
+.app:has(.app-footer details[open]) .main,
+.app:has(.app-footer details[open]) .main-content {
+  overflow: visible;
+}
+
+.app:has(.app-footer details[open]) .main-content {
+  flex: 1 0 auto;
+}
+
+@media (min-width: 901px) {
+  .app:has(.app-footer details[open]) .sidebar {
+    align-self: start;
+    top: var(--topbar-height);
+    height: calc(100dvh - var(--topbar-height));
+    max-height: calc(100dvh - var(--topbar-height));
+  }
 }
 
 .app-footer .capability-strip {
@@ -1731,34 +1693,6 @@ audio {
   font-weight: 500;
 }
 
-.engine-choices {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem 1.2rem;
-  margin-top: 0.45rem;
-}
-
-.engine-choice {
-  display: flex;
-  align-items: baseline;
-  gap: 0.3rem;
-  color: var(--muted);
-  font-size: 0.74rem;
-}
-
-.engine-choice strong {
-  color: var(--ink);
-  font-weight: 600;
-}
-
-.engine-choice[aria-disabled="true"] {
-  color: var(--faint);
-}
-
-.engine-choice[aria-disabled="true"] strong {
-  color: var(--muted);
-}
-
 .codec-list {
   display: grid;
   margin: 0.45rem 0;
@@ -1779,31 +1713,9 @@ audio {
 .codec-list li:first-child {
   border-top: 0;
 }
-
-.codec-identities,
 .codec-reason {
   color: var(--muted);
   font-size: 0.72rem;
-}
-
-.scope-note {
-  margin: 0;
-  padding-top: 0.55rem;
-  border-top: 1px solid var(--line);
-}
-
-.scope-note > summary {
-  width: max-content;
-  color: var(--muted);
-  font-size: 0.74rem;
-  font-weight: 500;
-}
-
-.scope-lede {
-  max-width: 78ch;
-  margin: 0.45rem 0 0;
-  color: var(--muted);
-  font-size: 0.82rem;
 }
 
 @media (hover: hover) {
@@ -1907,8 +1819,7 @@ audio {
     border-top: 1px solid var(--line);
   }
 
-  .delivered-grid,
-  .measurement-sides {
+  .delivered-grid{
     grid-template-columns: 1fr;
   }
 
@@ -2034,11 +1945,6 @@ audio {
     padding-inline: 0.9rem;
   }
 
-  .panel,
-  .results {
-    padding: 0.8rem;
-  }
-
   .listen-heading h1 {
     font-size: 1.08rem;
   }
@@ -2047,7 +1953,7 @@ audio {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.1rem;
-    min-height: 3.3rem;
+    min-height: 2rem;
   }
 
   .stage-status span {
@@ -2064,7 +1970,7 @@ audio {
   }
 
   .answer-buttons {
-    flex-direction: column;
+    flex-direction: row;
   }
 
   .answer-buttons button {

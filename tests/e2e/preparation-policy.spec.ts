@@ -265,16 +265,9 @@ test("corrected mono native matches the shared preparation policy on the same de
   expect(serialized).not.toContain("Infinity");
   expect(serialized).not.toContain("NaN");
 
-  await expect(page.locator(".preparation")).toContainText("Applied preparation");
-  await expect(page.locator(".preparation")).toContainText("Applied lag");
-  await expect(page.locator(".preparation")).toContainText("Applied crop");
-  await expect(page.locator(".preparation")).toContainText("Independent gains");
-  await expect(page.locator(".preparation")).toContainText("Common peak trim");
-  await expect(page.locator(".preparation")).toContainText("Pre-gain integrated loudness");
-  await expect(page.locator(".measurements")).toContainText("Residual lag");
-  await expect(page.locator(".measurements")).toContainText("Residual null depth");
-  await expect(page.locator(".measurements")).not.toContainText("not applied");
-  await expect(page.locator(".measurements")).not.toContainText("unchanged delivered");
+  await expect(page.locator(".measurements")).toContainText("Timing difference");
+  await expect(page.locator(".measurements")).toContainText("Null depth");
+  await expect(page.locator(".evidence-audio pre")).toHaveCount(0);
 
   console.log("[preparation observation] mono 44.1k: " + JSON.stringify({
     lag: preparation.alignment.lagSamples,
@@ -454,7 +447,7 @@ test("corrected mode refuses silence and short crops then retries cleanly", asyn
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
   await expect(page.locator(".run-status")).toContainText("Preparation failed.");
   await expect(page.locator(".status-error")).toContainText(/preparation-gate-failed.*non-evidentiary/);
-  await expect(page.locator(".results")).toHaveCount(0);
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Prepare diagnostic artifacts" }))
     .toBeEnabled();
 
@@ -464,7 +457,7 @@ test("corrected mode refuses silence and short crops then retries cleanly", asyn
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
   await expect(page.locator(".run-status")).toContainText("Preparation failed.");
   await expect(page.locator(".status-error")).toContainText(/short-crop/);
-  await expect(page.locator(".results")).toHaveCount(0);
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
 
   await chooseWav(page, "policy-recovered.wav", makePcm16Wav({
     sampleRate: 48000, channels: 1, seconds: 0.6,
@@ -495,7 +488,7 @@ test("corrected worker load failure fails closed and a fresh preparation retries
   await page.route(workerURL, (route) => route.abort());
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
   await expect(page.locator(".run-status")).toContainText("Preparation failed.");
-  await expect(page.locator(".results")).toHaveCount(0);
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Prepare diagnostic artifacts" }))
     .toBeEnabled();
   await page.unroute(workerURL);
@@ -610,7 +603,7 @@ test("cancel and reset during the real corrected worker start terminate it and p
   });
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
   await expect(page.locator(".run-status")).toContainText("Cancelled.", { timeout: 150_000 });
-  await expect(page.locator(".results")).toHaveCount(0);
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
 
   const afterCancel = await page.evaluate(() => (
     window as unknown as {
@@ -626,9 +619,9 @@ test("cancel and reset during the real corrected worker start terminate it and p
       .__preparationAction = "reset";
   });
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-  await expect(page.locator(".run-status")).toContainText("Idle.", { timeout: 150_000 });
-  await expect(page.locator(".results")).toHaveCount(0);
-  await expect(page.locator(".file-summary")).toContainText("No file selected");
+  await expect(page.locator(".run-status")).toBeEmpty({ timeout: 150_000 });
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
+  await expect(page.locator(".file-summary")).toHaveCount(0);
   await expect(page.locator("#source-file")).toHaveValue("");
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
 
@@ -703,7 +696,7 @@ test("corrupted preparation reports reject without publication and permit a clea
     }, mode);
     await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
     await expect(page.getByRole("alert")).toContainText("Preparation worker returned");
-    await expect(page.locator(".results")).toHaveCount(0);
+    await expect(page.locator(".evidence-audio")).toHaveCount(0);
     expect(await page.evaluate(() => {
       const state = (window as unknown as {
         __preparationCorruption: { created: number; terminated: number };

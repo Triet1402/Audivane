@@ -590,7 +590,7 @@ test("invalid, truncated and unsupported WAV sources fail closed and allow retry
       await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
       await expect(page.locator(".run-status")).toContainText("Preparation failed.");
       await expect(page.getByRole("alert").filter({ hasText: entry.pattern })).toBeVisible();
-      await expect(page.locator(".results")).toHaveCount(0);
+      await expect(page.locator(".evidence-audio")).toHaveCount(0);
       await expect(page.getByRole("button", { name: "Prepare diagnostic artifacts" }))
         .toBeEnabled();
     }
@@ -628,7 +628,7 @@ test("cancel and reset terminate the worker, block stale results, and permit ret
   });
   await page.getByRole("button", { name: "Cancel" }).click();
   await expect(page.locator(".run-status")).toContainText("Cancelled.", { timeout: 120_000 });
-  await expect(page.locator(".results")).toHaveCount(0);
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Prepare diagnostic artifacts" }))
     .toBeEnabled();
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
@@ -641,14 +641,14 @@ test("cancel and reset terminate the worker, block stale results, and permit ret
   expect(retry.a.delivered.frames).toBe(8820);
   expect(retry.b.delivered.frames).toBe(8820);
 
-  await page.getByRole("button", { name: "Load diagnostic sample A" }).click();
+  await page.getByRole("button", { name: "Preview A" }).click();
   await expect(page.locator("audio")).toHaveCount(1);
   await expect(page.locator("audio")).toHaveAttribute("src", /^blob:/);
 
   // Reset releases the artifact and revokes the diagnostic object URL.
   await page.getByRole("button", { name: "Reset", exact: true }).click();
-  await expect(page.locator(".run-status")).toContainText("Idle.");
-  await expect(page.locator(".results")).toHaveCount(0);
+  await expect(page.locator(".run-status")).toBeEmpty();
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
   await expect(page.locator("audio")).toHaveCount(0);
   await expect(page.locator("#source-file")).toHaveValue("");
 
@@ -658,10 +658,10 @@ test("cancel and reset terminate the worker, block stale results, and permit ret
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
   await expect(page.locator(".run-status")).toContainText("Preparing.");
   await page.getByRole("button", { name: "Reset", exact: true }).click();
-  await expect(page.locator(".run-status")).toContainText("Idle.", { timeout: 120_000 });
+  await expect(page.locator(".run-status")).toBeEmpty({ timeout: 120_000 });
   await expect(page.locator("#source-file")).toHaveValue("");
   await page.waitForTimeout(750);
-  await expect(page.locator(".results")).toHaveCount(0);
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
 
   // Retry after reset uses a new file and publishes only its own result.
   await chooseWav(page, "after-reset.wav", small);
@@ -770,7 +770,7 @@ test("cancel and reset during active measurement computation terminate the real 
   });
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
   await expect(page.locator(".run-status")).toContainText("Cancelled.", { timeout: 150_000 });
-  await expect(page.locator(".results")).toHaveCount(0);
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
 
   const afterCancel = await page.evaluate(() => (
     window as unknown as {
@@ -786,8 +786,8 @@ test("cancel and reset during active measurement computation terminate the real 
     (window as unknown as { __measurementAction?: string | null }).__measurementAction = "reset";
   });
   await page.getByRole("button", { name: "Prepare diagnostic artifacts" }).click();
-  await expect(page.locator(".run-status")).toContainText("Idle.", { timeout: 150_000 });
-  await expect(page.locator(".results")).toHaveCount(0);
+  await expect(page.locator(".run-status")).toBeEmpty({ timeout: 150_000 });
+  await expect(page.locator(".evidence-audio")).toHaveCount(0);
   await expect(page.locator("#source-file")).toHaveValue("");
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
 

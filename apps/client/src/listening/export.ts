@@ -5,7 +5,7 @@ import type {
 } from "@codec-abx/contracts";
 import { GAIN_RAMP_SECONDS, LIVE_SCHEDULE_LEAD_SECONDS, MIN_LOOP_SECONDS } from "@codec-abx/playback";
 
-import { producerAmbiguityDisclosures } from "../diagnostics.js";
+import { buildDiagnosticExport, producerAmbiguityDisclosures } from "../diagnostics.js";
 
 export const LISTENING_EXPORT_SCHEMA = "codec-abx-browser-listening-v1" as const;
 
@@ -23,6 +23,7 @@ export interface ListeningExport {
   readonly experiment: ExperimentExport;
   readonly prepared: Readonly<Record<string, unknown>>;
   readonly playback: Readonly<Record<string, unknown>>;
+  readonly diagnostics: Readonly<Record<string, unknown>>;
   readonly limitations: readonly string[];
 }
 
@@ -127,6 +128,7 @@ export function buildListeningExport(input: ListeningExportInput): ListeningExpo
 
   return {
     schema: LISTENING_EXPORT_SCHEMA,
+    diagnostics: buildDiagnosticExport(artifact, exportedAt),
     exportedAt,
     listening: {
       authority: snapshot.authority,

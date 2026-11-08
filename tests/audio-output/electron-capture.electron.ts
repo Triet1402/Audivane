@@ -1,3 +1,4 @@
+import { clickRunAction } from "../ui/run-actions.js";
 import { test, expect, _electron as electron, type ElectronApplication } from "@playwright/test";
 import { promises as fs } from "node:fs";
 import os from "node:os";
@@ -89,7 +90,7 @@ test("real sandboxed Electron app routes live TrialPlayer audio into the private
       await page.getByRole("button", { name: "Play", exact: true }).click();
       await page.waitForTimeout(1200);
       mark("reset");
-      await page.getByRole("button", { name: "Reset listening run" }).click();
+      await clickRunAction(page, "Reset listening run");
       await page.waitForTimeout(1500);
     });
     const pcm = readWav(capture.recorders[0]!.wavPath);
@@ -137,7 +138,7 @@ test("real sandboxed Electron app routes live TrialPlayer audio into the private
     // confirmed receipt auto-advance, and require the old token to cover the
     // staging/handoff until an explicit A repick selects the new token.
     await page.locator('button[data-tab="setup"]').click();
-    await expect(page.getByRole("heading", { name: "Set up a comparison", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Codec chains", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Prepare test", exact: true }).click();
     await expect(page.locator("#listen-view")).toBeVisible();
     await expect(trial).toBeVisible({ timeout: 180_000 });
@@ -199,7 +200,7 @@ test("real sandboxed Electron app routes live TrialPlayer audio into the private
       await answerButton.click();
       const nextToken = await tokenAfter(answeredToken);
       expect(nextToken).not.toBe(answeredToken);
-      await expect(page.getByText("Previous trial audio", { exact: true })).toBeVisible();
+      await expect(page.locator(".stage-status")).not.toContainText("Previous trial audio");
       for (const current of ["A", "B", "X"] as const) {
         await expect(page.getByRole("button", { name: `Monitor playback label ${current}` }))
           .toHaveAttribute("aria-pressed", "false");
@@ -216,7 +217,7 @@ test("real sandboxed Electron app routes live TrialPlayer audio into the private
       await pause.click();
       await page.waitForTimeout(700);
       mark("reset");
-      await page.getByRole("button", { name: "Reset listening run" }).click();
+      await clickRunAction(page, "Reset listening run");
       await page.waitForTimeout(900);
     });
     const handoffPcm = readWav(handoff.recorders[0]!.wavPath);
