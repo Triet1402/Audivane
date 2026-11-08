@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1
+
+- Renamed bundled Latin font subsets in metadata and CSS to avoid the reserved font name.
+- Preserved IBM copyright and OFL notices and added font modification hashes and reproduction instructions.
+- Added the client source font license copy and website MIT license metadata.
+- Rebuilt desktop downloads and the website with the corrected assets and release materials.
+
 ## 0.2.0
 
 - Simplified Setup, Listen and Evidence with clearer statistics and fewer technical labels.

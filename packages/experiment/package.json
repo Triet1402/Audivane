@@ -1,6 +1,6 @@
 {
   "name": "@codec-abx/experiment",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -8,8 +8,8 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@codec-abx/contracts": "0.2.0",
-    "@codec-abx/measurements": "0.2.0",
-    "@codec-abx/preparation-policy": "0.2.0"
+    "@codec-abx/contracts": "0.2.1",
+    "@codec-abx/measurements": "0.2.1",
+    "@codec-abx/preparation-policy": "0.2.1"
   }
 }

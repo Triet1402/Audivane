@@ -85,7 +85,7 @@ test("native ordered codec chain prepares, binds, plays and exports through the 
 
     await page.evaluate(() => document.fonts.ready);
     expect(await page.evaluate(() => Array.from(document.fonts).some(
-      font => font.family === "IBM Plex Sans" && font.status === "loaded",
+      font => font.family === "Audivane Sans Latin" && font.status === "loaded",
     ))).toBe(true);
     await page.getByRole("button", { name: "Choose local audio…" }).click();
     await expect(page.locator(".file-summary")).toContainText("chain-fixture-96k-stereo.wav");

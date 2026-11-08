@@ -4,7 +4,7 @@ description: Which licenses cover Audivane's own code, the FFmpeg and codec libr
 order: 5
 updated: 2026-11-08
 source: docs/distribution-licenses.md
-source_sha256: 8876dbc0427a1a2e7a55ce0a53e4a89d5df3ca09dac0f17214c7345615c52c58
+source_sha256: 3365e9e794d58ce39272d164c4321bc2043d94cb1aa5a73e5134891a144a5c8e
 ---
 
 Audivane's own code is MIT; every dependency keeps its own license, and
@@ -24,7 +24,7 @@ build and license materials with verified checksums.
 | AOSP libldac and libldacdec | Apache-2.0, MIT | LDAC encode/decode for the native helper and optional browser module |
 | Electron / Chromium / Node.js | MIT plus Chromium third-party licenses | Desktop runtime |
 | React | MIT | Bundled client JavaScript |
-| IBM Plex Sans and IBM Plex Mono | SIL Open Font License 1.1 | Self-hosted fonts, no runtime font fetch |
+| Audivane Sans/Mono Latin (derived from IBM Plex) | SIL Open Font License 1.1 | Self-hosted fonts, no runtime font fetch |
 | `@ffmpeg/ffmpeg` | MIT | Browser wrapper |
 | `@ffmpeg/core` | GPL-2.0-or-later | Browser WASM core (not used by native desktop codecs) |
 

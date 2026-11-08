@@ -347,12 +347,14 @@
     },
     {
       "id": "ibm-plex",
-      "name": "IBM Plex Sans",
+      "name": "Audivane Sans/Mono Latin (derived from IBM Plex)",
       "license": "SIL Open Font License 1.1",
       "paths": [
-        "apps/client/public/ibm-plex-OFL.txt"
+        "apps/client/public/ibm-plex-OFL.txt",
+        "third_party/fonts.json",
+        "docs/font-licensing.md"
       ],
-      "notes": "Copied with the client build; keep beside the font assets."
+      "notes": "Renamed Latin subsets retain IBM copyright and OFL; include modification provenance with releases."
     },
     {
       "id": "measurements",

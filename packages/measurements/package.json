@@ -1,6 +1,6 @@
 {
   "name": "@codec-abx/measurements",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -9,6 +9,6 @@
     "./fft": "./src/fft.ts"
   },
   "dependencies": {
-    "@codec-abx/contracts": "0.2.0"
+    "@codec-abx/contracts": "0.2.1"
   }
 }

@@ -8,13 +8,11 @@ then compare them in a blind ABX listening test.
 Audio processing stays on your machine. The browser uses WASM codecs; the
 Electron desktop app uses native codecs.
 
-**Version:** `0.2.0`. This update simplifies
-Setup, Listen and Evidence, fixes post-run audio previews and downloads, and
-combines listening records with diagnostics in one export.
-See the [0.2.0 release notes](docs/release-notes-0.2.0.md).
+**Version:** `0.2.1`. This patch corrects bundled font naming and license notices.
+See the [0.2.1 release notes](docs/release-notes-0.2.1.md).
 
 Download desktop packages and matching source materials from
-[GitHub Releases](https://github.com/Triet1402/Audivane/releases/tag/0.2.0).
+[GitHub Releases](https://github.com/Triet1402/Audivane/releases/tag/0.2.1).
 See [release readiness](docs/releasing.md) for build and publication status.
 
 ## Try it from source

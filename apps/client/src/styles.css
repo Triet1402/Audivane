@@ -1,5 +1,5 @@
 @font-face {
-  font-family: "IBM Plex Sans";
+  font-family: "Audivane Sans Latin";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -7,7 +7,7 @@
 }
 
 @font-face {
-  font-family: "IBM Plex Sans";
+  font-family: "Audivane Sans Latin";
   font-style: normal;
   font-weight: 500;
   font-display: swap;
@@ -15,7 +15,7 @@
 }
 
 @font-face {
-  font-family: "IBM Plex Sans";
+  font-family: "Audivane Sans Latin";
   font-style: normal;
   font-weight: 600;
   font-display: swap;
@@ -23,7 +23,7 @@
 }
 
 @font-face {
-  font-family: "IBM Plex Sans";
+  font-family: "Audivane Sans Latin";
   font-style: normal;
   font-weight: 700;
   font-display: swap;
@@ -31,7 +31,7 @@
 }
 
 @font-face {
-  font-family: "IBM Plex Mono";
+  font-family: "Audivane Mono Latin";
   font-style: normal;
   font-weight: 500;
   font-display: swap;
@@ -40,8 +40,8 @@
 
 :root {
   color-scheme: light;
-  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: "Audivane Sans Latin", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Audivane Mono Latin", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --bg: #f1f2f5;
   --surface: #ffffff;
   --surface-2: #e9ebf1;

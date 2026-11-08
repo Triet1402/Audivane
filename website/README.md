@@ -92,10 +92,8 @@ find website/dist/demo/ -type f -print0 | sort -z | xargs -0 sha256sum
 ```
 
 Prefer a committed revision. If the tree contains local changes, record them
-exactly instead of presenting the revision as a clean release. The workspace
-and client manifests report version `0.1.0`; keep that consistent with the
-manifests and do not claim a different version. The application has not been
-publicly released.
+exactly instead of presenting the revision as a clean release. The workspace and client manifests report version `0.2.1`; keep deployment
+metadata consistent with those manifests.
 
 Keep the evidence local (for example under the ignored `build/` directory) or
 in the deployment record below. Do not publish source history, local build
@@ -303,8 +301,7 @@ those markers while the web release gates are open, and do not present `/demo/`
 as a released download or a completed browser release.
 
 Do not add download links, platform certification, release tags or launch
-claims until the release gates have their own evidence. `0.1.0` is still an
-unpublished candidate.
+claims until the release gates have their own evidence. See the current release status and downloads page for published versions.
 
 ## Deployment record
 

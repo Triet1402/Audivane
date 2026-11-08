@@ -24,7 +24,7 @@ review of the intended channels, regions or patent exposure.
 | hegdi/libldacdec (`7f3bd6cc…`) | MIT, copyright 2021 Dirk Helbig | Static dependency of `ldac_helper`; optional browser LDAC module |
 | Electron 45.1.0 / Chromium / Node.js | MIT plus Chromium third-party licenses | Desktop runtime; packager preserves `LICENSE` and `LICENSES.chromium.html` |
 | React / React DOM 19.3.1 | MIT | Bundled client JavaScript |
-| IBM Plex Sans | SIL Open Font License 1.1 | Self-hosted fonts; `apps/client/public/ibm-plex-OFL.txt` |
+| Audivane Sans/Mono Latin (derived from IBM Plex) | SIL Open Font License 1.1 | Self-hosted fonts; `apps/client/public/ibm-plex-OFL.txt` |
 | Measurement attribution | MIT notice in `packages/measurements/NOTICE.md` | Translated loudness implementation and retained comparison code |
 | `@ffmpeg/ffmpeg` 0.12.15 | MIT | Browser wrapper |
 | `@ffmpeg/core` 0.12.10 | GPL-2.0-or-later | Browser WASM core (not a native desktop codec) |
