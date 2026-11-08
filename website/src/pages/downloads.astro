@@ -11,9 +11,8 @@ const assets = "https://github.com/Triet1402/Audivane/releases/download/0.2.0";
   <div class="section-head wrap">
     <h1>Downloads</h1>
     <p class="lead">
-      Download Audivane 0.2.0 for Linux or Windows. Read the <a href={release}>release notes and known testing limits</a> before installing. You can
-      use the <a href="/demo/">browser preview</a> now; audio processing stays
-      on your device.
+      Download Audivane 0.2.0 for Linux or Windows, or use the
+      <a href="/demo/">browser app</a> now. Audio processing stays on your device.
     </p>
   </div>
 
@@ -30,54 +29,39 @@ const assets = "https://github.com/Triet1402/Audivane/releases/download/0.2.0";
         <tbody>
           <tr>
             <th scope="row">Linux x64 (Ubuntu 24.04 baseline)</th>
-            <td>Built for Ubuntu 24.04 or newer. Package structure and checksums verified. Installed desktop and physical listening coverage remains incomplete.</td>
+            <td>Available</td>
             <td><a href={`${assets}/audivane_0.2.0_amd64.deb`}>Download .deb</a></td>
           </tr>
           <tr>
             <th scope="row">Arch x86_64</th>
-            <td>Built with native Arch tooling. Package structure and checksums verified. New installed-platform and upgrade acceptance is not claimed.</td>
-            <td><a href={`${assets}/audivane-bin-0.2.0-1-x86_64.pkg.tar.zst`}>Download Arch package</a><br />App 0.2.0, package revision 1.</td>
+            <td>Available</td>
+            <td><a href={`${assets}/audivane-bin-0.2.0-1-x86_64.pkg.tar.zst`}>Download Arch package</a></td>
           </tr>
           <tr>
             <th scope="row">Windows x64</th>
-            <td>Unsigned installer and portable ZIP. Package structure and checksums verified. Full installed codec, upgrade and physical listening coverage remains incomplete.</td>
+            <td>Available — unsigned builds</td>
             <td><a href={`${assets}/Audivane-Setup-0.2.0-x64.exe`}>Download installer</a><br /><a href={`${assets}/Audivane-0.2.0-win32-x64.zip`}>Download portable ZIP</a></td>
           </tr>
           <tr>
             <th scope="row">macOS</th>
-            <td>Deferred. No release packaging or acceptance is implemented.</td>
-            <td>None announced</td>
+            <td>Not planned for 0.2.0</td>
+            <td>—</td>
           </tr>
           <tr>
             <th scope="row">Browser app</th>
-            <td>Try the working <a href="/demo/">browser preview</a>, with <a href="/sources/">matching source and codec materials</a>. Desktop version 0.2.0 is available below.</td>
-            <td>Served from this site</td>
+            <td>Available</td>
+            <td><a href="/demo/">Open the browser app</a></td>
           </tr>
         </tbody>
       </table>
     </section>
 
-    <p>Verify downloads with the <a href={`${assets}/SHA256SUMS.txt`}>SHA-256 checksums</a>. <a href={release}>Application source, codec materials and platform manifests</a> accompany the release.</p>
-
-    <section class="downloads-notes" aria-labelledby="promise-title">
-      <div>
-        <h2 id="promise-title">What every published download includes</h2>
-        <ul>
-          <li>SHA-256 checksums for every artifact.</li>
-          <li>Provenance and the complete matching application, native source, build and license materials.</li>
-          <li>Recorded platform checks and explicit remaining testing limits.</li>
-        </ul>
-      </div>
-      <div>
-        <h2>No mirror, no bundle</h2>
-        <p>
-          Audivane will not distribute via unofficial mirrors or repackaged
-          "codec packs". The browser runtime and the desktop app carry
-          different codec materials, and each gets its own honest status before
-          it claims anything. Read the boundaries in the <a
-          href="/docs/scientific-policy/">scientific policy</a>.
-        </p>
-      </div>
-    </section>
+    <p>
+      Every download ships with <a href={`${assets}/SHA256SUMS.txt`}>SHA-256 checksums</a>,
+      matching <a href={release}>source, codec materials and build scripts</a>,
+      and its recorded testing limits. Windows builds are unsigned, and
+      installed-platform and physical listening coverage is incomplete —
+      see the <a href="/docs/release-status/">release status</a>.
+    </p>
   </div>
 </BaseLayout>

@@ -42,7 +42,7 @@ const guides = (await getCollection("guides")).sort((a, b) => a.data.order - b.d
         <a class="button quiet" href="/docs/what-is-abx/">How ABX works</a>
       </div>
       <p class="availability">
-        Audivane 0.2.0 is available for Linux and Windows. Try the updated <a href="/demo/">browser app</a>. <a href="/downloads/">Download the desktop app</a>. <a href="/docs/release-status/">Release status</a>
+        Audivane 0.2.0 is available for <a href="/downloads/">Linux and Windows</a>. Try the updated <a href="/demo/">browser app</a>.
       </p>
     </div>
     <figure class="comparison">
@@ -72,8 +72,7 @@ const guides = (await getCollection("guides")).sort((a, b) => a.data.order - b.d
 
   <div class="local">
     <div class="wrap">
-      <span>Runs in your browser. Audio stays on your device.</span>
-      <span>The website downloads the app to your browser. Your browser processes and plays your audio locally; your audio files are never uploaded to Audivane.</span>
+      <span>Runs in your browser. Your audio is processed on your device and never uploaded.</span>
     </div>
   </div>
 
@@ -82,15 +81,15 @@ const guides = (await getCollection("guides")).sort((a, b) => a.data.order - b.d
     <div class="steps">
       <article>
         <h3>Bring a track you know.</h3>
-        <p>Import a local audio file and choose the codec chain for each side. Both chains start from the same decoded source.</p>
+        <p>Import a local audio file and pick a codec chain for each side.</p>
       </article>
       <article>
         <h3>Prepare a fair comparison.</h3>
-        <p>Audivane aligns and level-matches the pair, verifies the delivered audio, and stages the first trial paused. You decide when to play.</p>
+        <p>Audivane aligns and level-matches the pair and stages the first trial paused. You decide when to play.</p>
       </article>
       <article>
         <h3>Listen. Choose. Review.</h3>
-        <p>Switch between A, B and X, then decide whether X is A or B. Complete the planned trials and review the results and preparation evidence.</p>
+        <p>Answer “Is X A or B?” for each planned trial, then review the result and the evidence behind it.</p>
       </article>
     </div>
   </section>
@@ -98,10 +97,6 @@ const guides = (await getCollection("guides")).sort((a, b) => a.data.order - b.d
   <section class="learn wrap" aria-labelledby="learn-title">
     <div class="learn-head">
       <h2 id="learn-title">Understand the method.</h2>
-      <p>
-        Short, exact answers about how Audivane tests — and how to set up,
-        run and read a comparison that means something.
-      </p>
     </div>
     <div class="learn-columns">
       <div class="learn-list">
@@ -134,36 +129,22 @@ const guides = (await getCollection("guides")).sort((a, b) => a.data.order - b.d
       <div>
         <h2 id="release-title">Your music.<br />Your comparison.</h2>
         <p>
-          Audivane 0.2.0 is available for Linux and Windows. This site is the
-          project's home; documentation, guides, release status and
-          downloads with checksums and provenance all live
-          here.
+          Audivane 0.2.0 for Linux and Windows — SHA-256 checksums,
+          provenance and complete source with every release.
         </p>
       </div>
-      <dl class="platforms">
-        <div>
-          <dt>Linux desktop</dt>
-          <dd>Version 0.2.0 Debian and Arch packages are available with verified package structure and checksums. Final installed desktop and physical listening coverage remains incomplete.</dd>
-        </div>
-        <div>
-          <dt>Windows desktop</dt>
-          <dd>Unsigned 0.2.0 installer and portable downloads are available with verified package structure and checksums. Installed codec and upgrade coverage remains incomplete.</dd>
-        </div>
-        <div>
-          <dt>Browser demo</dt>
-          <dd>Try the working <a href="/demo/">browser preview</a>. <a href="/sources/">Source and codec materials</a> accompany it; desktop downloads are available for version 0.2.0.</dd>
-        </div>
-      </dl>
+      <div class="hero-actions">
+        <a class="button" href="/downloads/">Download <span aria-hidden="true">↗</span></a>
+        <a class="button quiet" href="/docs/release-status/">Release status</a>
+      </div>
     </div>
   </section>
 
   <section class="scope wrap" aria-labelledby="scope-title">
     <h2 id="scope-title">Evidence, with its limits.</h2>
     <p>
-      Audivane records preparation, delivered-audio identity and fixed-trial
-      ABX results. Numerical checks alone do not prove an audible difference or
-      certify a codec. Your hardware, operating-system processing and listening
-      conditions still matter.
+      Numerical checks alone do not prove an audible difference or certify a
+      codec — your hardware and listening conditions still matter.
     </p>
     <p><a href="/docs/scientific-policy/">Read the scientific policy →</a></p>
   </section>

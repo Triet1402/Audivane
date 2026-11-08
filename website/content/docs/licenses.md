@@ -2,16 +2,14 @@
 title: Licenses and third-party credits
 description: Which licenses cover Audivane's own code, the FFmpeg and codec libraries, the fonts and the desktop runtime.
 order: 5
-updated: 2026-11-06
+updated: 2026-11-08
 source: docs/distribution-licenses.md
 source_sha256: 8876dbc0427a1a2e7a55ce0a53e4a89d5df3ca09dac0f17214c7345615c52c58
 ---
 
-Audivane is built from open source, and each component keeps its own license.
-The application's own code is MIT; nothing else is relabeled. Every published
-release ships the complete matching source, build and license materials —
-notices, pinned source archives with verified checksums and build scripts —
-alongside the installers.
+Audivane's own code is MIT; every dependency keeps its own license, and
+nothing is relabeled. Published releases ship the complete matching source,
+build and license materials with verified checksums.
 
 ## License map
 
@@ -30,27 +28,13 @@ alongside the installers.
 | `@ffmpeg/ffmpeg` | MIT | Browser wrapper |
 | `@ffmpeg/core` | GPL-2.0-or-later | Browser WASM core (not used by native desktop codecs) |
 
-Version pins above describe the current native release materials. A published
-release's own materials are authoritative for the exact builds it ships.
-
-## Source materials and reproducibility
-
-The browser preview's [application source, codec sources, build materials and
-license notices](/sources/) are available alongside the app.
-
-For the native desktop builds, every third-party source archive is pinned by
-URL and SHA-256 (or a canonical content hash where the upstream regenerates
-archive bytes). The collector verifies the pins and assembles the complete
-license, notice, source and build payload so any reviewer can rebuild the
-codec artifacts from the same exact inputs.
-
 ## Notes
 
-- The MIT license applies to Audivane's own code only. No dependency license is
-  replaced or reinterpreted.
-- LGPL components are dynamically linked where the license calls for it, and
-  the corresponding object/source materials accompany the distribution so the
-  LGPL obligations are exercisable.
-- Codec availability does not imply patent clearance. Whether particular codecs
-  and formats may be distributed or used in a given region is a legal question
-  that depends on the channel and jurisdiction, and is part of release review.
+- Every third-party source archive used by the desktop builds is pinned by URL
+  and SHA-256, so any reviewer can rebuild the codec artifacts from the same
+  exact inputs. The browser preview's [source and codec
+  materials](/sources/) accompany the app.
+- LGPL components are dynamically linked where the license requires it, with
+  the corresponding materials shipped alongside.
+- Codec availability does not imply patent clearance; distribution rights
+  depend on jurisdiction and channel.
