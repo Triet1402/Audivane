@@ -70,6 +70,7 @@ export const productionUnitFiles = Object.freeze([
   'tools/test/release-pipeline.test.mjs',
   'tools/test/arch-distribution.test.mjs',
   'tools/test/provenance.test.mjs',
+  'tools/test/font-subsets.test.mjs',
   'tools/test/production-contract.test.mjs',
   'tools/test/unit-args.test.mjs',
   'tools/test/verification.test.mjs',

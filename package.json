@@ -17,6 +17,7 @@
     "check:ts": "npm run typecheck && npm run test:ts",
     "assets:copy": "node tools/copy-wasm-assets.mjs",
     "check:native": "node --import tsx packages/engine-native/src/typescript/readiness-cli.ts",
+    "check:fonts": "node tools/check-subset-fonts.mjs",
     "dev": "npm run assets:copy && vite --config apps/client/vite.config.ts",
     "build:client": "node tools/verification/build.mjs client",
     "preview:client": "vite preview --config apps/client/vite.config.ts",

@@ -10,63 +10,99 @@
   "files": [
     {
       "path": "apps/client/src/assets/fonts/ibm-plex-mono-latin-500.woff2",
+      "family": "Audivane Mono Latin",
       "originalSha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
-      "sha256": "9a7b36b2fd1c01f3cc653723559eca1549480adaafef478df27490664517743d"
+      "sha256": "9a7b36b2fd1c01f3cc653723559eca1549480adaafef478df27490664517743d",
+      "contentSha256": "d41e9930f3d98d876a05dacb76b741a82e0032fe9f4392d02f20d2ff38ebd425",
+      "originalContentSha256": "d41e9930f3d98d876a05dacb76b741a82e0032fe9f4392d02f20d2ff38ebd425"
     },
     {
       "path": "apps/client/src/assets/fonts/ibm-plex-sans-latin-400.woff2",
+      "family": "Audivane Sans Latin",
       "originalSha256": "3b646991d30055a93a4ecc499713d4347953a74a947ecab435ab72070cbdab0e",
-      "sha256": "33423d21f03922af127238311050c636bd3b0cda212ce4a6013458655c049b67"
+      "sha256": "33423d21f03922af127238311050c636bd3b0cda212ce4a6013458655c049b67",
+      "contentSha256": "38123c6cb11608f7c31481c9bbdfff0ec4dbd0a4561c6d1969ed071713f5478e",
+      "originalContentSha256": "38123c6cb11608f7c31481c9bbdfff0ec4dbd0a4561c6d1969ed071713f5478e"
     },
     {
       "path": "apps/client/src/assets/fonts/ibm-plex-sans-latin-500.woff2",
+      "family": "Audivane Sans Latin",
       "originalSha256": "0717336fb31fcdcde4b8deb3675bb4a0f7f6d484864afcd6751ac29975962203",
-      "sha256": "778b0e60de4df0160222935d98b0c47e5a05ea51f27bc778cb170b15a1f54bc4"
+      "sha256": "778b0e60de4df0160222935d98b0c47e5a05ea51f27bc778cb170b15a1f54bc4",
+      "contentSha256": "41c7d4f63a45254e5ce31be2bfab4de5016ae3e7d2875b67a3ca17cf6795b0ca",
+      "originalContentSha256": "41c7d4f63a45254e5ce31be2bfab4de5016ae3e7d2875b67a3ca17cf6795b0ca"
     },
     {
       "path": "apps/client/src/assets/fonts/ibm-plex-sans-latin-600.woff2",
+      "family": "Audivane Sans Latin",
       "originalSha256": "8960851d691c054ed38e259bdcf1a6190d157b4203ed5bb32c632a863fb8ec2f",
-      "sha256": "c059d01628f80f79d5781fd698fbf4e80a73629ed71259efea33781c1838f219"
+      "sha256": "c059d01628f80f79d5781fd698fbf4e80a73629ed71259efea33781c1838f219",
+      "contentSha256": "5bdb2782e1439815da41a08cf7e63054b6e6b53448feada9132f5c56a4ea393b",
+      "originalContentSha256": "5bdb2782e1439815da41a08cf7e63054b6e6b53448feada9132f5c56a4ea393b"
     },
     {
       "path": "apps/client/src/assets/fonts/ibm-plex-sans-latin-700.woff2",
+      "family": "Audivane Sans Latin",
       "originalSha256": "42e7b0c143c19df9d99fd896e76b48f846edf0902d200bc29796b34d12c33aa7",
-      "sha256": "8fb1a0f8895739cf2d8337da132941d41f63f6f15c33c7067f3592d32575a011"
+      "sha256": "8fb1a0f8895739cf2d8337da132941d41f63f6f15c33c7067f3592d32575a011",
+      "contentSha256": "2841b4b9f4103ed3918a63897934ce9a375182a6864db83997cbdba8e3bc0900",
+      "originalContentSha256": "2841b4b9f4103ed3918a63897934ce9a375182a6864db83997cbdba8e3bc0900"
     },
     {
       "path": "apps/landing/public/fonts/ibm-plex-sans-latin-400.woff2",
+      "family": "Audivane Sans Latin",
       "originalSha256": "3b646991d30055a93a4ecc499713d4347953a74a947ecab435ab72070cbdab0e",
-      "sha256": "33423d21f03922af127238311050c636bd3b0cda212ce4a6013458655c049b67"
+      "sha256": "33423d21f03922af127238311050c636bd3b0cda212ce4a6013458655c049b67",
+      "contentSha256": "38123c6cb11608f7c31481c9bbdfff0ec4dbd0a4561c6d1969ed071713f5478e",
+      "originalContentSha256": "38123c6cb11608f7c31481c9bbdfff0ec4dbd0a4561c6d1969ed071713f5478e"
     },
     {
       "path": "apps/landing/public/fonts/ibm-plex-sans-latin-600.woff2",
+      "family": "Audivane Sans Latin",
       "originalSha256": "8960851d691c054ed38e259bdcf1a6190d157b4203ed5bb32c632a863fb8ec2f",
-      "sha256": "c059d01628f80f79d5781fd698fbf4e80a73629ed71259efea33781c1838f219"
+      "sha256": "c059d01628f80f79d5781fd698fbf4e80a73629ed71259efea33781c1838f219",
+      "contentSha256": "5bdb2782e1439815da41a08cf7e63054b6e6b53448feada9132f5c56a4ea393b",
+      "originalContentSha256": "5bdb2782e1439815da41a08cf7e63054b6e6b53448feada9132f5c56a4ea393b"
     },
     {
       "path": "apps/landing/public/fonts/ibm-plex-sans-latin-700.woff2",
+      "family": "Audivane Sans Latin",
       "originalSha256": "42e7b0c143c19df9d99fd896e76b48f846edf0902d200bc29796b34d12c33aa7",
-      "sha256": "8fb1a0f8895739cf2d8337da132941d41f63f6f15c33c7067f3592d32575a011"
+      "sha256": "8fb1a0f8895739cf2d8337da132941d41f63f6f15c33c7067f3592d32575a011",
+      "contentSha256": "2841b4b9f4103ed3918a63897934ce9a375182a6864db83997cbdba8e3bc0900",
+      "originalContentSha256": "2841b4b9f4103ed3918a63897934ce9a375182a6864db83997cbdba8e3bc0900"
     },
     {
       "path": "website/public/fonts/ibm-plex-mono-latin-500.woff2",
+      "family": "Audivane Mono Latin",
       "originalSha256": "01d285447409c8a588692162439a038b8cbd7871309ee20267b0d2d91c6e8e22",
-      "sha256": "9a7b36b2fd1c01f3cc653723559eca1549480adaafef478df27490664517743d"
+      "sha256": "9a7b36b2fd1c01f3cc653723559eca1549480adaafef478df27490664517743d",
+      "contentSha256": "d41e9930f3d98d876a05dacb76b741a82e0032fe9f4392d02f20d2ff38ebd425",
+      "originalContentSha256": "d41e9930f3d98d876a05dacb76b741a82e0032fe9f4392d02f20d2ff38ebd425"
     },
     {
       "path": "website/public/fonts/ibm-plex-sans-latin-400.woff2",
+      "family": "Audivane Sans Latin",
       "originalSha256": "3b646991d30055a93a4ecc499713d4347953a74a947ecab435ab72070cbdab0e",
-      "sha256": "33423d21f03922af127238311050c636bd3b0cda212ce4a6013458655c049b67"
+      "sha256": "33423d21f03922af127238311050c636bd3b0cda212ce4a6013458655c049b67",
+      "contentSha256": "38123c6cb11608f7c31481c9bbdfff0ec4dbd0a4561c6d1969ed071713f5478e",
+      "originalContentSha256": "38123c6cb11608f7c31481c9bbdfff0ec4dbd0a4561c6d1969ed071713f5478e"
     },
     {
       "path": "website/public/fonts/ibm-plex-sans-latin-600.woff2",
+      "family": "Audivane Sans Latin",
       "originalSha256": "8960851d691c054ed38e259bdcf1a6190d157b4203ed5bb32c632a863fb8ec2f",
-      "sha256": "c059d01628f80f79d5781fd698fbf4e80a73629ed71259efea33781c1838f219"
+      "sha256": "c059d01628f80f79d5781fd698fbf4e80a73629ed71259efea33781c1838f219",
+      "contentSha256": "5bdb2782e1439815da41a08cf7e63054b6e6b53448feada9132f5c56a4ea393b",
+      "originalContentSha256": "5bdb2782e1439815da41a08cf7e63054b6e6b53448feada9132f5c56a4ea393b"
     },
     {
       "path": "website/public/fonts/ibm-plex-sans-latin-700.woff2",
+      "family": "Audivane Sans Latin",
       "originalSha256": "42e7b0c143c19df9d99fd896e76b48f846edf0902d200bc29796b34d12c33aa7",
-      "sha256": "8fb1a0f8895739cf2d8337da132941d41f63f6f15c33c7067f3592d32575a011"
+      "sha256": "8fb1a0f8895739cf2d8337da132941d41f63f6f15c33c7067f3592d32575a011",
+      "contentSha256": "2841b4b9f4103ed3918a63897934ce9a375182a6864db83997cbdba8e3bc0900",
+      "originalContentSha256": "2841b4b9f4103ed3918a63897934ce9a375182a6864db83997cbdba8e3bc0900"
     }
   ]
 }
