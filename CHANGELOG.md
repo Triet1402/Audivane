@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.2
 
 - Added `npm run check:fonts`: verifies the renamed font subsets against
   `third_party/fonts.json` — unmodified file bytes, names free of the reserved
@@ -9,7 +9,9 @@
   `node tools/check-subset-fonts.mjs --fingerprint <file>` reproduces a
   recorded original fingerprint from any upstream file independently; the
   full verification list is in `docs/font-licensing.md`.
-- Release documentation now reflects that 0.2.1 is published.
+- Rebuilt desktop downloads and the website with the codified verification.
+- Fixed a stale playback unit test asserting a completion notice that the
+  0.2.0 listening revamp removed.
 
 ## 0.2.1
 

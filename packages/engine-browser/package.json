@@ -1,6 +1,6 @@
 {
   "name": "@codec-abx/engine-browser",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -8,10 +8,10 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@codec-abx/contracts": "0.2.1",
-    "@codec-abx/measurements": "0.2.1",
-    "@codec-abx/preparation": "0.2.1",
-    "@codec-abx/preparation-policy": "0.2.1",
+    "@codec-abx/contracts": "0.2.2",
+    "@codec-abx/measurements": "0.2.2",
+    "@codec-abx/preparation": "0.2.2",
+    "@codec-abx/preparation-policy": "0.2.2",
     "@ffmpeg/core": "0.12.10",
     "@ffmpeg/ffmpeg": "0.12.15"
   }

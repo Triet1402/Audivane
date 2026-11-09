@@ -896,7 +896,9 @@ test("the final accepted answer stops audio and draws no further token", async (
   assert.equal(controller.state.session, "completed");
   assert.equal(controller.state.answered, true);
   assert.equal(controller.state.playback?.playing, false);
-  assert.match(controller.state.notice ?? "", /Pre-registered N reached/);
+  // The 0.2.0 listening revamp removed controller-emitted completion notices;
+  // completed runs surface through the session lifecycle instead.
+  assert.equal(controller.state.notice, null);
 });
 
 test("a paused answer stays paused across auto-advance and needs an explicit pick and Play", async () => {

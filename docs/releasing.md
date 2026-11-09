@@ -1,11 +1,11 @@
 # Audivane release preparation
 
-Status: **0.2.1 published**. Version `0.2.1` is assigned across
-workspace manifests, internal dependencies, lockfiles and application metadata.
-The current published release is
-[0.2.1](https://github.com/Triet1402/Audivane/releases/tag/0.2.1), described
-in the [0.2.1 release notes](release-notes-0.2.1.md). The previous release is
-[0.2.0](https://github.com/Triet1402/Audivane/releases/tag/0.2.0).
+Status: **0.2.2 published**. Version `0.2.2` is assigned across workspace
+manifests, internal dependencies, lockfiles and application metadata. The
+current published release is
+[0.2.2](https://github.com/Triet1402/Audivane/releases/tag/0.2.2), described
+in the [0.2.2 release notes](release-notes-0.2.2.md). The previous release is
+[0.2.1](https://github.com/Triet1402/Audivane/releases/tag/0.2.1).
 
 ## Release route
 
@@ -17,10 +17,10 @@ then stage a GitHub draft release. Keep public download links on the latest
 published release until the draft is published. Never relabel 0.1.0 packages as
 0.2.0 or transfer their acceptance claims to the new binaries.
 
-For 0.2.1, keep checks focused on version consistency, TypeScript compilation,
+For 0.2.2, keep checks focused on version consistency, TypeScript compilation,
 building, and structural/checksum verification. No broad automated UI suite is
 part of this preparation. Installed-platform and physical listening coverage
-remain separate, as recorded in the [release notes](release-notes-0.2.1.md).
+remain separate, as recorded in the [release notes](release-notes-0.2.2.md).
 
 ## Build inputs and local commands
 
@@ -144,4 +144,4 @@ fabricated public URL. Flathub is the preferred later Linux catalog and WinGet
 the preferred Windows listing after installer acceptance. npm publication is
 not needed for desktop users. No stores, releases or repository settings are
 changed by these build commands. The
-[0.2.1 release notes](release-notes-0.2.1.md) describe the published release.
+[0.2.2 release notes](release-notes-0.2.2.md) describe the published release.
