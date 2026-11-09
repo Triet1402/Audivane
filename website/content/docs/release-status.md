@@ -2,9 +2,9 @@
 title: Release status
 description: Audivane 0.2.1 downloads, changes and verification status.
 order: 4
-updated: 2026-11-08
+updated: 2026-11-09
 source: docs/release-notes-0.2.1.md
-source_sha256: c7bafad50f5e85e543ffe98e4bf6fcf387bfbf6cb2cabcbd10929944411e8815
+source_sha256: 792e6010423d476b640d8c530575cbd53b093e7ca542b463d1e5350813e2cc2a
 ---
 
 ## 0.2.1 — available
@@ -33,7 +33,10 @@ published packages. macOS and AppImage downloads are not planned for 0.2.1.
 ### Verification
 
 Release preparation passed version consistency, TypeScript compilation, package
-structure and checksum checks. No new full installed-platform, upgrade or physical
-listening pass is claimed. Previous 0.1.0 checks apply to those earlier artifacts.
+structure and checksum checks. The font checks are now codified as
+`npm run check:fonts`, verifying the bundled subsets against the recorded
+hashes and content fingerprints in `third_party/fonts.json`. No new full
+installed-platform, upgrade or physical listening pass is claimed. Previous
+0.1.0 checks apply to those earlier artifacts.
 Windows builds remain unsigned. Audio processing stays local, and the existing
 preparation gates and fixed-trial scoring remain in place.

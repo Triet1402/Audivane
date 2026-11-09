@@ -22,8 +22,11 @@ artifacts. No macOS or AppImage package is provided.
 ## Verification and limits
 
 Font checks confirm unchanged glyph, metric and copyright data across all
-12 bundled files. Distribution/provenance tests, version consistency,
-TypeScript compilation, builds and structural/checksum verification cover this
-patch. No new full installed-platform, upgrade or physical listening pass is
-claimed. Windows builds remain unsigned. Codec patent/distribution review is
+12 bundled files, codified as `npm run check:fonts`
+(`tools/check-subset-fonts.mjs`; the verified properties are listed in the
+repository's font licensing documentation). Distribution/provenance tests, version
+consistency, TypeScript compilation, builds and structural/checksum
+verification cover this patch. No new full installed-platform, upgrade or
+physical listening pass is claimed. Windows builds remain unsigned. Codec
+patent/distribution review is
 separate from these font and notice corrections.

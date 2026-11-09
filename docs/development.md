@@ -25,12 +25,15 @@ then run:
 
 ```bash
 npm run check:native
+npm run check:fonts
 npm run build:desktop
 npm run desktop
 npm run package:desktop
 ```
 
 `check:native` probes actual encoder/decoder support (`-- --json` for a report).
+`check:fonts` verifies the bundled renamed font subsets against
+`third_party/fonts.json`; see [font licensing](font-licensing.md).
 For local development, executable paths can be set with `CODEC_ABX_FFMPEG`,
 `CODEC_ABX_FFPROBE` and `CODEC_ABX_LDAC_HELPER`; otherwise tools are discovered
 on PATH. Missing capabilities refuse explicitly.

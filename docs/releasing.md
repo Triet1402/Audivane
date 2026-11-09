@@ -1,9 +1,11 @@
 # Audivane release preparation
 
-Status: **0.2.1 release preparation**. Version `0.2.1` is assigned across
+Status: **0.2.1 published**. Version `0.2.1` is assigned across
 workspace manifests, internal dependencies, lockfiles and application metadata.
-See [0.2.1 release notes](release-notes-0.2.1.md). The previous published release
-is [0.2.0](https://github.com/Triet1402/Audivane/releases/tag/0.2.0).
+The current published release is
+[0.2.1](https://github.com/Triet1402/Audivane/releases/tag/0.2.1), described
+in the [0.2.1 release notes](release-notes-0.2.1.md). The previous release is
+[0.2.0](https://github.com/Triet1402/Audivane/releases/tag/0.2.0).
 
 ## Release route
 
@@ -15,10 +17,10 @@ then stage a GitHub draft release. Keep public download links on the latest
 published release until the draft is published. Never relabel 0.1.0 packages as
 0.2.0 or transfer their acceptance claims to the new binaries.
 
-For 0.2.0, keep checks focused on version consistency, TypeScript compilation,
+For 0.2.1, keep checks focused on version consistency, TypeScript compilation,
 building, and structural/checksum verification. No broad automated UI suite is
 part of this preparation. Installed-platform and physical listening coverage
-remain separate, as recorded in the [release notes](release-notes-0.2.0.md).
+remain separate, as recorded in the [release notes](release-notes-0.2.1.md).
 
 ## Build inputs and local commands
 
@@ -90,9 +92,12 @@ Desktop deliberately excludes unused browser FFmpeg/LC3/LDAC WASM and glue
 assets. Acceptance inspects the actual packaged files and completes native
 listening without them. Electron/Chromium notices, IBM Plex OFL, translated
 measurement attribution, React/Scheduler and the MIT FFmpeg wrapper notice
-remain required. Browser publication still needs exact corresponding source
-for the GPL-declared `@ffmpeg/core` and its build; desktop exclusion does not
-complete web redistribution materials.
+remain required. `npm run check:fonts` verifies every bundled renamed font
+subset against `third_party/fonts.json`; the verified properties are listed in
+[font licensing](font-licensing.md).
+Browser publication still needs exact corresponding source for the
+GPL-declared `@ffmpeg/core` and its build; desktop exclusion does not complete
+web redistribution materials.
 
 Prepare source attachments from the final clean release repository after its
 source and binaries have been reviewed. The existing attachment command is:
@@ -138,4 +143,5 @@ GitHub Releases is the intended first binary/source channel, without a
 fabricated public URL. Flathub is the preferred later Linux catalog and WinGet
 the preferred Windows listing after installer acceptance. npm publication is
 not needed for desktop users. No stores, releases or repository settings are
-changed by these build commands. The [0.2.0 release notes](release-notes-0.2.0.md) describe the current candidate.
+changed by these build commands. The
+[0.2.1 release notes](release-notes-0.2.1.md) describe the published release.

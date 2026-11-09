@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Added `npm run check:fonts`: verifies the renamed font subsets against
+  `third_party/fonts.json` — unmodified file bytes, names free of the reserved
+  font name, preserved IBM copyright/OFL records and content fingerprints
+  proving the glyph and metric data are unchanged from the original subsets.
+  `node tools/check-subset-fonts.mjs --fingerprint <file>` reproduces a
+  recorded original fingerprint from any upstream file independently; the
+  full verification list is in `docs/font-licensing.md`.
+- Release documentation now reflects that 0.2.1 is published.
+
 ## 0.2.1
 
 - Renamed bundled Latin font subsets in metadata and CSS to avoid the reserved font name.

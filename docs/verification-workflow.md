@@ -9,6 +9,7 @@ need local-link and diff checks.
 | Command | Scope |
 | --- | --- |
 | `npm run typecheck` | Strict TypeScript checking |
+| `npm run check:fonts` | Bundled renamed font subsets against `third_party/fonts.json` |
 | `npm run test:unit -- packages/experiment/test/chain.test.ts` | Selected unit file |
 | `npm run test:desktop:unit` | Desktop boundaries and lifecycle |
 | `npm run test:browser -- --project chromium-dev tests/e2e/ui-codec-chains.spec.ts` | Selected browser acceptance |
